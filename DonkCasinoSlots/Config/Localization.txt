@@ -1,0 +1,3 @@
+casinoTilted_name,Tilted,Tilted,You feel rattled after losing savings.
+casinoTilted_desc,Take +50% damage; hunger/thirst drain +50%; stamina efficiency halved.,Take +50% damage; hunger/thirst drain +50%; stamina efficiency halved.,Tilted by a nasty spin.
+casinoSlotMachine,Casino Slot Machine,Casino Slot Machine,Place to try your luck.

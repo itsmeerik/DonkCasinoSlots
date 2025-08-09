@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <append xpath="/blocks">
+        <block name="cntCasinoSlot">
+            <property name="Extends" value="cntVendingMachine"/>
+            <property name="Class" value="Workstation"/>
+            <property name="Workstation" value="casino_slot"/>
+            <property name="CreativeMode" value="Player"/>
+            <property name="PickupAllowed" value="false"/>
+            <property name="MaxDamage" value="400"/>
+            <property name="DamageReceived" value="entities:1,explosion:4,melee:1,bullet:1,fire:2"/>
+            <property name="ShowInspectionWindow" value="true"/>
+            <property name="CustomIcon" value="cntVendingMachine"/>
+            <property name="IsTrader" value="false"/>
+            <property name="TraderArea" value="false"/>
+        </block>
+    </append>
+</config>

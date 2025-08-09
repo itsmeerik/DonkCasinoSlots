@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <append xpath="/items">
+        <!-- The placeable item that drops the cntCasinoSlot block -->
+        <item name="casinoSlotMachine">
+            <property name="CustomIcon" value="cntVendingMachine"/>
+            <property name="Group" value="Other"/>
+
+            <!-- Keep it crafting-only -->
+            <property name="CreativeMode" value="None"/>          <!-- hide from creative menu -->
+            <property name="EconomicValue" value="0"/>            <!-- no trader value -->
+            <property name="SellableToTrader" value="false"/>     <!-- can't sell to trader -->
+
+            <property class="Action0">
+                <property name="Class" value="PlaceBlock"/>
+                <property name="PlaceBlock" value="cntCasinoSlot"/>
+            </property>
+        </item>
+    </append>
+</config>

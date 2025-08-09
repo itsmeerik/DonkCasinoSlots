@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configs>
+    <append xpath="/xui">
+        <!-- Map our workstation type to a custom window group -->
+        <workstation_window_group output_slots="48" workstation="casino_slot" window_group="workstation_casino_slot">
+            <grid name="output" cols="8" rows="6" slot_grid="true" pos="20,-170" cell_width="60" cell_height="60"/>
+        </workstation_window_group>
+    </append>
+</configs>

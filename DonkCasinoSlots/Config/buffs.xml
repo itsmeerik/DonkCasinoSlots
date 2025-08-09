@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <append xpath="/buffs">
+        <buff name="buffCasinoTilted" icon="ui_game_symbol_unhappy" duration="600" stack_type="replace">
+            <display_value name_key="casinoTilted_name" desc_key="casinoTilted_desc" />
+            <effect_group>
+                <!-- Hunger/Thirst: drain 50% faster -->
+                <passive_effect name="FoodChangeOT"  operation="perc_add" value="0.5"/>
+                <passive_effect name="WaterChangeOT" operation="perc_add" value="0.5"/>
+
+                <!-- Stamina efficiency: halve regeneration -->
+                <passive_effect name="StaminaChangeOT" operation="perc_subtract" value="0.5"/>
+            </effect_group>
+        </buff>
+    </append>
+</config>

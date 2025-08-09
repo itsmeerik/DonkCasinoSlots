@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<casino>
+    <economy spin_cost_dukes="500"/>
+    <odds reallyBad="0.02" bad="0.68" good="0.28" jackpot="0.02"/>
+    <badEffects tilted="0.35" explode="0.15" spawn="0.50"/> <!-- used only when 'bad' hits -->
+    <ragdoll radius="10" base_force="1.3" upward_bias="0.25" duration="2.5" falloff="linear"/>
+
+    <buckets>
+        <!-- Bad: usually nothing → 0–2 picks (tune to 0–1 for “mostly nothing”) -->
+        <bucket name="bad" rolls_min="1" rolls_max="2"/>
+        <!-- Good: 1–3 items -->
+        <bucket name="good" rolls_min="1" rolls_max="3"/>
+        <!-- Jackpot: 2–5 items -->
+        <bucket name="jackpot" rolls_min="2" rolls_max="5"/>
+    </buckets>
+    
+    <group name="bad">
+        <item name="casinoCoin" min="50" max="250" weight="35"/>
+        <item name="resourceBone" min="5"  max="15" weight="5"/>
+        <item name="brassDoorknob" min="1" max="2"  weight="5"/>
+        <item name="canEmpty" min="2" max="6" weight="5"/>
+        <item name="nothing" min="0" max="0" weight="35"/>
+    </group>
+
+    <group name="good">
+        <item name="casinoCoin" min="300" max="900" weight="35"/>
+        <item name="ammo9mmBulletBall" min="100" max="1000" weight="25"/>
+        <item name="firstAidBandage" min="2" max="5" weight="20"/>
+        <item name="gunPartMachinePistol" min="1" max="1" weight="10"/>
+        <item name="modMeleeStructuralBrace" min="1" max="1" weight="10"/>
+    </group>
+
+    <group name="jackpot">
+        <item name="casinoCoin" min="5000" max="15000" weight="55"/>
+        <item name="modWeaponSilencer" min="1" max="1" weight="15"/>
+        <item name="vehicleAccessories4x4Truck" min="1" max="1" weight="10"/>
+        <item name="bookUrbanCombatV7" min="1" max="1" weight="10"/>
+        <item name="diamond" min="1" max="2" weight="10"/>
+    </group>
+</casino>

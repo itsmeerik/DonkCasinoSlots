@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <ModInfo>
+        <Name value="DonkCasinoSlots"/>
+        <Description value="Casino slot machine with winnings inventory + Double or Nothing."/>
+        <Author value="Donk"/>
+        <Version value="1.0.0"/>
+        <GameVersion value="v2.1"/>
+    </ModInfo>
+</xml>
