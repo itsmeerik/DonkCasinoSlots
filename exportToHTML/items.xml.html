@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>items.xml</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c191ff;}
+.s1 { color: #85c46c;}
+.s2 { color: #c9a26d;}
+.s3 { color: #d0d0d0;}
+.s4 { color: #85c46c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+items.xml</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;?</span><span class="s1">xml version</span><span class="s2">=&quot;1.0&quot; </span><span class="s1">encoding</span><span class="s2">=&quot;utf-8&quot;</span><span class="s0">?&gt;</span>
+<span class="s0">&lt;config&gt;</span>
+    <span class="s0">&lt;append </span><span class="s1">xpath</span><span class="s2">=&quot;/items&quot;</span><span class="s0">&gt;</span>
+        <span class="s4">&lt;!-- The placeable item that drops the cntCasinoSlot block --&gt;</span>
+        <span class="s0">&lt;item </span><span class="s1">name</span><span class="s2">=&quot;casinoSlotMachine&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;CustomIcon&quot; </span><span class="s1">value</span><span class="s2">=&quot;cntVendingMachine&quot;</span><span class="s0">/&gt;</span>
+            <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;Group&quot; </span><span class="s1">value</span><span class="s2">=&quot;Other&quot;</span><span class="s0">/&gt;</span>
+
+            <span class="s4">&lt;!-- Keep it crafting-only --&gt;</span>
+            <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;CreativeMode&quot; </span><span class="s1">value</span><span class="s2">=&quot;None&quot;</span><span class="s0">/&gt;          </span><span class="s4">&lt;!-- hide from creative menu --&gt;</span>
+            <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;EconomicValue&quot; </span><span class="s1">value</span><span class="s2">=&quot;0&quot;</span><span class="s0">/&gt;            </span><span class="s4">&lt;!-- no trader value --&gt;</span>
+            <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;SellableToTrader&quot; </span><span class="s1">value</span><span class="s2">=&quot;false&quot;</span><span class="s0">/&gt;     </span><span class="s4">&lt;!-- can't sell to trader --&gt;</span>
+
+            <span class="s0">&lt;property </span><span class="s1">class</span><span class="s2">=&quot;Action0&quot;</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;Class&quot; </span><span class="s1">value</span><span class="s2">=&quot;PlaceBlock&quot;</span><span class="s0">/&gt;</span>
+                <span class="s0">&lt;property </span><span class="s1">name</span><span class="s2">=&quot;PlaceBlock&quot; </span><span class="s1">value</span><span class="s2">=&quot;cntCasinoSlot&quot;</span><span class="s0">/&gt;</span>
+            <span class="s0">&lt;/property&gt;</span>
+        <span class="s0">&lt;/item&gt;</span>
+    <span class="s0">&lt;/append&gt;</span>
+<span class="s0">&lt;/config&gt;</span>
+</pre>
+</body>
+</html>

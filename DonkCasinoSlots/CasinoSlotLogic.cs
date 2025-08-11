@@ -56,34 +56,6 @@ namespace DonkCasinoSlots
             te.SetModified(); // sync to clients
         }
         
-        static void EnsureOutputSize(TileEntityWorkstation te, int desired)
-{
-    try
-    {
-        if (te.output != null && te.output.Length >= desired) return;
-
-        var old = te.output ?? Array.Empty<ItemStack>();
-        var newer = new ItemStack[desired];
-        var n = Math.Min(old.Length, newer.Length);
-        for (int i = 0; i < n; i++) newer[i] = old[i];
-
-        // assign (direct or via reflection fallback)
-        try {
-            te.output = newer;
-        } catch {
-            var f = typeof(TileEntityWorkstation).GetField("output",
-                System.Reflection.BindingFlags.Instance |
-                System.Reflection.BindingFlags.Public |
-                System.Reflection.BindingFlags.NonPublic);
-            f?.SetValue(te, newer);
-        }
-
-        te.SetModified();
-    }
-    catch { /* best-effort; don’t crash the server */ }
-}
-
-
         static void DoSpin(World world, EntityPlayer player, TileEntityWorkstation te, ItemStack[] output)
         {
             if (!Util.TryTakeDukes(player, CasinoConfig.SpinCost))
@@ -107,9 +79,9 @@ namespace DonkCasinoSlots
                 case "bad":
                     // Roll from the "bad" list using configured picks and bursts.
                     // If you want "pure nothing most of the time", set rolls_min/max low and keep a heavy-weight "nothing" entry in the Bad group.
-                    addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Bad, CasinoConfig.BadRolls);
+                    addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Bad, CasinoConfig.BadRolls, player.entityId);
                     if (!addedAny)
-                        world.GetGameManager().PlaySoundAtPositionServer("ui_denied", te.ToWorldPos().ToVector3());
+                        world.GetGameManager().PlaySoundAtPositionServer(te.ToWorldPos().ToVector3(), "ui_denied", AudioRolloffMode.Linear, 30);
                     break;
 
                 case "reallybad":
@@ -122,16 +94,19 @@ namespace DonkCasinoSlots
                 }
 
                 case "good":
-                    addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Good, CasinoConfig.GoodRolls);
+                    addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Good, CasinoConfig.GoodRolls, player.entityId);
                     if (addedAny)
                         world.GetGameManager()
-                            .PlaySoundAtPositionServer("ui_trader_purchase", te.ToWorldPos().ToVector3());
+                            .PlaySoundAtPositionServer(te.ToWorldPos().ToVector3(), "ui_trader_purchase", AudioRolloffMode.Linear, 30);
                     break;
 
                 case "jackpot":
-                    addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Jackpot, CasinoConfig.JackpotRolls);
+                    addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Jackpot, CasinoConfig.JackpotRolls, player.entityId);
                     if (addedAny)
-                        world.GetGameManager().Instance.ChatMessageServer(null, $"{player.EntityName} hit the JACKPOT!", "800080");
+                        GameManager.Instance.ChatMessageServer(
+                            null, EChatType.Global, -1,
+                            $"{player.EntityName} hit the JACKPOT!",
+                            null, EMessageSender.Server);       
                     break;
             }
         }
@@ -152,7 +127,7 @@ namespace DonkCasinoSlots
             if (!win)
             {
                 Array.Clear(output, 0, output.Length);
-                world.GetGameManager().PlaySoundAtPositionServer("ui_denied", te.ToWorldPos().ToVector3());
+                world.GetGameManager().PlaySoundAtPositionServer(te.ToWorldPos().ToVector3(), "ui_denied", AudioRolloffMode.Linear, 30);
                 return;
             }
 
@@ -173,10 +148,10 @@ namespace DonkCasinoSlots
             foreach (var add in toAdd)
             {
                 if (!TryMergeInto(output, add))
-                    world.gameManager.SpawnItemInWorld(add, te.ToWorldPos().ToVector3() + Vector3.up * 1.2f);
+                    GameManager.Instance.ItemDropServer(add, te.ToWorldPos().ToVector3() + Vector3.up * 1.2f, Vector3.zero, -1, 60f, false);
             }
 
-            world.GetGameManager().PlaySoundAtPositionServer("ui_mission_complete", te.ToWorldPos().ToVector3());
+            world.GetGameManager().PlaySoundAtPositionServer(te.ToWorldPos().ToVector3(), "ui_mission_complete", AudioRolloffMode.Linear, 30);
         }
 
         // === Loot rolling with picks + bursts (and optional unique draws) ===
@@ -185,7 +160,8 @@ namespace DonkCasinoSlots
             TileEntityWorkstation te,
             ItemStack[] output,
             List<LootEntry> group,
-            CasinoConfig.BucketCfg cfg)
+            BucketCfg cfg,
+            int ownerEntityId)
         {
             if (group == null || group.Count == 0) return false;
 
@@ -212,7 +188,7 @@ namespace DonkCasinoSlots
                     int count = UnityEngine.Random.Range(e.min, e.max + 1);
                     if (count <= 0) continue;
 
-                    GiveToOutput(world, te, output, e.name, count);
+                    GiveToOutput(world, te, output, e.name, count, ownerEntityId);
                     any = true;
 
                     if (cfg.Unique)
@@ -255,7 +231,7 @@ namespace DonkCasinoSlots
         }
 
 
-        static void GiveToOutput(World world, TileEntityWorkstation te, ItemStack[] output, string name, int count)
+        static void GiveToOutput(World world, TileEntityWorkstation te, ItemStack[] output, string name, int count, int ownerEntityId)
         {
             var iv = ItemClass.GetItem(name, false);
             if (iv.IsEmpty()) return;
@@ -277,8 +253,30 @@ namespace DonkCasinoSlots
 
             // Spill to world if still leftover
             if (stack.count > 0)
-                world.gameManager.SpawnItemInWorld(new ItemStack(iv, stack.count),
-                    te.ToWorldPos().ToVector3() + Vector3.up * 1.2f);
+            {
+                var dropPos = te.ToWorldPos().ToVector3() + Vector3.up * 1.2f;
+
+                // If you have the player/owner id in scope, pass it; otherwise use -1
+
+                try
+                {
+                    // Common v2.x signature
+                    world.gameManager.ItemDropServer(
+                        new ItemStack(iv, stack.count),
+                        dropPos,
+                        Vector3.zero,
+                        ownerEntityId,
+                        60f);
+                }
+                catch
+                {
+                    // Fallback (older signature without owner/lifetime)
+                    world.gameManager.ItemDropServer(
+                        new ItemStack(iv, stack.count),
+                        dropPos,
+                        Vector3.zero);
+                }
+            }
         }
 
         static bool TryMergeInto(ItemStack[] grid, ItemStack add)
@@ -315,13 +313,16 @@ namespace DonkCasinoSlots
         static void ApplyTilted(EntityPlayer player)
         {
             player.Buffs?.AddBuff("buffCasinoTilted");
-            GameManager.Instance.ChatMessageServer(null, $"{player.EntityName} is TILTED!", "FFAA00");
+            GameManager.Instance.ChatMessageServer(
+                null, EChatType.Global, -1,
+                $"{player.EntityName} is TILTED!", 
+                null, EMessageSender.Server);
         }
 
         static void BlowUpMachine(World world, TileEntity te)
         {
             var pos = te.ToWorldPos();
-            world.GetGameManager().PlaySoundAtPositionServer("explosion_small", pos.ToVector3());
+            world.GetGameManager().PlaySoundAtPositionServer(pos.ToVector3(), "explosion_small", AudioRolloffMode.Linear, 30);
             world.SetBlockRPC(pos, BlockValue.Air); // destroy the block cleanly
 
             RagdollBurst(world, pos.ToVector3() + Vector3.up * 0.5f,
@@ -429,7 +430,7 @@ namespace DonkCasinoSlots
             // 3) Impulse / knockback: use DamageEntity with explosion-type source (safe in most builds)
             try
             {
-                var ds = new DamageSource(DamageSourceType.Explosion);
+                var ds = new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Bashing);
                 // Strength=1 (tiny) + large impulse scales better than large damage.
                 // Last param is often "impulseScale" in recent builds.
                 ep.DamageEntity(ds, 1, false, Mathf.Max(1f, push.magnitude * 2f));

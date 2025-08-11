@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>ModEntry.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #c9a26d;}
+.s4 { color: #85c46c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ModEntry.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">HarmonyLib</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">UnityEngine</span><span class="s2">;</span>
+
+<span class="s0">namespace </span><span class="s1">DonkCasinoSlots</span>
+<span class="s2">{</span>
+    <span class="s0">public class </span><span class="s1">ModEntry : IModApi</span>
+    <span class="s2">{</span>
+        <span class="s0">public static </span><span class="s1">Harmony Harmony</span><span class="s2">;</span>
+
+        <span class="s0">public void </span><span class="s1">InitMod</span><span class="s2">(</span><span class="s1">Mod mod</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s1">Harmony </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Harmony</span><span class="s2">(</span><span class="s3">&quot;com.donk.casino.v21&quot;</span><span class="s2">);</span>
+            <span class="s1">Harmony</span><span class="s2">.</span><span class="s1">PatchAll</span><span class="s2">(</span><span class="s1">Assembly</span><span class="s2">.</span><span class="s1">GetExecutingAssembly</span><span class="s2">());</span>
+            <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">Load</span><span class="s2">(); </span><span class="s4">// read Config/casino_loot.xml</span>
+            <span class="s1">Log</span><span class="s2">.</span><span class="s1">Out</span><span class="s2">(</span><span class="s3">&quot;[DonkCasinoSlots] Loaded. Spin cost: {0}&quot;</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">SpinCost</span><span class="s2">);</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s4">// Hook the workstation window buttons</span>
+    <span class="s2">[</span><span class="s1">HarmonyPatch</span><span class="s2">(</span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">XUiC_WorkstationWindowGroup</span><span class="s2">), </span><span class="s3">&quot;OnOpen&quot;</span><span class="s2">)]</span>
+    <span class="s0">public class </span><span class="s1">Patch_WorkstationOpen</span>
+    <span class="s2">{</span>
+        <span class="s0">static void </span><span class="s1">Postfix</span><span class="s2">(</span><span class="s1">XUiC_WorkstationWindowGroup __instance</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">__instance</span><span class="s2">.</span><span class="s1">WindowGroup </span><span class="s2">== </span><span class="s0">null</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">__instance</span><span class="s2">.</span><span class="s1">WindowGroup</span><span class="s2">.</span><span class="s1">Name </span><span class="s2">!= </span><span class="s3">&quot;workstation_casino_slot&quot;</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+            <span class="s1">var te </span><span class="s2">= </span><span class="s1">__instance?</span><span class="s2">.</span><span class="s1">tileEntity </span><span class="s0">as </span><span class="s1">TileEntityWorkstation</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">te </span><span class="s2">!= </span><span class="s0">null </span><span class="s2">&amp;&amp; </span><span class="s1">__instance</span><span class="s2">.</span><span class="s1">WindowGroup?</span><span class="s2">.</span><span class="s1">Name </span><span class="s2">== </span><span class="s3">&quot;workstation_casino_slot&quot;</span><span class="s2">)</span>
+                <span class="s1">CasinoSlotLogic</span><span class="s2">.</span><span class="s1">EnsureOutputSize</span><span class="s2">(</span><span class="s1">te</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">OutputSlots</span><span class="s2">);</span>
+
+            
+            <span class="s1">var spinBtn   </span><span class="s2">= </span><span class="s1">__instance</span><span class="s2">.</span><span class="s1">WindowGroup</span><span class="s2">.</span><span class="s1">Controller</span><span class="s2">.</span><span class="s1">GetChildById</span><span class="s2">(</span><span class="s3">&quot;btnCasinoSpin&quot;</span><span class="s2">)   </span><span class="s0">as </span><span class="s1">XUiController</span><span class="s2">;</span>
+            <span class="s1">var doubleBtn </span><span class="s2">= </span><span class="s1">__instance</span><span class="s2">.</span><span class="s1">WindowGroup</span><span class="s2">.</span><span class="s1">Controller</span><span class="s2">.</span><span class="s1">GetChildById</span><span class="s2">(</span><span class="s3">&quot;btnCasinoDouble&quot;</span><span class="s2">) </span><span class="s0">as </span><span class="s1">XUiController</span><span class="s2">;</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">spinBtn </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">)   </span><span class="s1">spinBtn</span><span class="s2">.</span><span class="s1">OnPress </span><span class="s2">+= (</span><span class="s1">_</span><span class="s2">, </span><span class="s1">__</span><span class="s2">) </span><span class="s1">=&gt; Util</span><span class="s2">.</span><span class="s1">SendCasinoAction</span><span class="s2">(</span><span class="s1">__instance</span><span class="s2">, </span><span class="s1">CasinoActionType</span><span class="s2">.</span><span class="s1">Spin</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">doubleBtn </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">) </span><span class="s1">doubleBtn</span><span class="s2">.</span><span class="s1">OnPress </span><span class="s2">+= (</span><span class="s1">_</span><span class="s2">, </span><span class="s1">__</span><span class="s2">) </span><span class="s1">=&gt; Util</span><span class="s2">.</span><span class="s1">SendCasinoAction</span><span class="s2">(</span><span class="s1">__instance</span><span class="s2">, </span><span class="s1">CasinoActionType</span><span class="s2">.</span><span class="s1">DoubleOrNothing</span><span class="s2">);</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s4">// Register our NetPackage on both sides</span>
+    <span class="s2">[</span><span class="s1">HarmonyPatch</span><span class="s2">(</span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">NetPackageManager</span><span class="s2">), </span><span class="s3">&quot;RegisterNetPackages&quot;</span><span class="s2">)]</span>
+    <span class="s0">public class </span><span class="s1">Patch_RegisterPkg</span>
+    <span class="s2">{</span>
+        <span class="s0">static void </span><span class="s1">Postfix</span><span class="s2">(</span><span class="s1">NetPackageManager __instance</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s1">__instance</span><span class="s2">.</span><span class="s1">RegisterNetPackage</span><span class="s2">&lt;</span><span class="s1">NetPackageCasinoAction</span><span class="s2">&gt;();</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>

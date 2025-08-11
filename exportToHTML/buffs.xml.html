@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>buffs.xml</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c191ff;}
+.s1 { color: #85c46c;}
+.s2 { color: #c9a26d;}
+.s3 { color: #d0d0d0;}
+.s4 { color: #85c46c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+buffs.xml</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;?</span><span class="s1">xml version</span><span class="s2">=&quot;1.0&quot; </span><span class="s1">encoding</span><span class="s2">=&quot;utf-8&quot;</span><span class="s0">?&gt;</span>
+<span class="s0">&lt;config&gt;</span>
+    <span class="s0">&lt;append </span><span class="s1">xpath</span><span class="s2">=&quot;/buffs&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;buff </span><span class="s1">name</span><span class="s2">=&quot;buffCasinoTilted&quot; </span><span class="s1">icon</span><span class="s2">=&quot;ui_game_symbol_unhappy&quot; </span><span class="s1">duration</span><span class="s2">=&quot;600&quot; </span><span class="s1">stack_type</span><span class="s2">=&quot;replace&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;display_value </span><span class="s1">name_key</span><span class="s2">=&quot;casinoTilted_name&quot; </span><span class="s1">desc_key</span><span class="s2">=&quot;casinoTilted_desc&quot; </span><span class="s0">/&gt;</span>
+            <span class="s0">&lt;effect_group&gt;</span>
+                <span class="s4">&lt;!-- Hunger/Thirst: drain 50% faster --&gt;</span>
+                <span class="s0">&lt;passive_effect </span><span class="s1">name</span><span class="s2">=&quot;FoodChangeOT&quot;  </span><span class="s1">operation</span><span class="s2">=&quot;perc_add&quot; </span><span class="s1">value</span><span class="s2">=&quot;0.5&quot;</span><span class="s0">/&gt;</span>
+                <span class="s0">&lt;passive_effect </span><span class="s1">name</span><span class="s2">=&quot;WaterChangeOT&quot; </span><span class="s1">operation</span><span class="s2">=&quot;perc_add&quot; </span><span class="s1">value</span><span class="s2">=&quot;0.5&quot;</span><span class="s0">/&gt;</span>
+
+                <span class="s4">&lt;!-- Stamina efficiency: halve regeneration --&gt;</span>
+                <span class="s0">&lt;passive_effect </span><span class="s1">name</span><span class="s2">=&quot;StaminaChangeOT&quot; </span><span class="s1">operation</span><span class="s2">=&quot;perc_subtract&quot; </span><span class="s1">value</span><span class="s2">=&quot;0.5&quot;</span><span class="s0">/&gt;</span>
+            <span class="s0">&lt;/effect_group&gt;</span>
+        <span class="s0">&lt;/buff&gt;</span>
+    <span class="s0">&lt;/append&gt;</span>
+<span class="s0">&lt;/config&gt;</span>
+</pre>
+</body>
+</html>

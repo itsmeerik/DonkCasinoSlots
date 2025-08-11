@@ -1,0 +1,476 @@
+<html>
+<head>
+<title>CasinoSlotLogic.cs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #6c95eb;}
+.s1 { color: #d0d0d0;}
+.s2 { color: #bdbdbd;}
+.s3 { color: #ed94c0;}
+.s4 { color: #85c46c; font-style: italic;}
+.s5 { color: #c9a26d;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+CasinoSlotLogic.cs</font>
+</center></td></tr></table>
+<pre><span class="s0">using </span><span class="s1">System</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">System</span><span class="s2">.</span><span class="s1">Collections</span><span class="s2">.</span><span class="s1">Generic</span><span class="s2">;</span>
+<span class="s0">using </span><span class="s1">UnityEngine</span><span class="s2">;</span>
+<span class="s0">namespace </span><span class="s1">DonkCasinoSlots</span>
+<span class="s2">{</span>
+    <span class="s0">public static class </span><span class="s1">CasinoSlotLogic</span>
+    <span class="s2">{</span>
+        <span class="s0">static void </span><span class="s1">EnsureOutputSize</span><span class="s2">(</span><span class="s1">TileEntityWorkstation te</span><span class="s2">, </span><span class="s0">int </span><span class="s1">desired</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">try</span>
+            <span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">te</span><span class="s2">.</span><span class="s1">output </span><span class="s2">!= </span><span class="s0">null </span><span class="s2">&amp;&amp; </span><span class="s1">te</span><span class="s2">.</span><span class="s1">output</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">&gt;= </span><span class="s1">desired</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+
+                <span class="s1">var old </span><span class="s2">= </span><span class="s1">te</span><span class="s2">.</span><span class="s1">output ?? Array</span><span class="s2">.</span><span class="s1">Empty</span><span class="s2">&lt;</span><span class="s1">ItemStack</span><span class="s2">&gt;();</span>
+                <span class="s1">var newer </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">[</span><span class="s1">desired</span><span class="s2">];</span>
+                <span class="s1">var n </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">(</span><span class="s1">old</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">, </span><span class="s1">newer</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">);</span>
+                <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">n</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++) </span><span class="s1">newer</span><span class="s2">[</span><span class="s1">i</span><span class="s2">] = </span><span class="s1">old</span><span class="s2">[</span><span class="s1">i</span><span class="s2">];</span>
+
+                <span class="s4">// assign (direct or via reflection fallback)</span>
+                <span class="s0">try </span><span class="s2">{</span>
+                    <span class="s1">te</span><span class="s2">.</span><span class="s1">output </span><span class="s2">= </span><span class="s1">newer</span><span class="s2">;</span>
+                <span class="s2">} </span><span class="s0">catch </span><span class="s2">{</span>
+                    <span class="s1">var f </span><span class="s2">= </span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">TileEntityWorkstation</span><span class="s2">).</span><span class="s1">GetField</span><span class="s2">(</span><span class="s5">&quot;output&quot;</span><span class="s2">,</span>
+                        <span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Instance </span><span class="s2">|</span>
+                        <span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Public </span><span class="s2">|</span>
+                        <span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">NonPublic</span><span class="s2">);</span>
+                    <span class="s1">f?</span><span class="s2">.</span><span class="s1">SetValue</span><span class="s2">(</span><span class="s1">te</span><span class="s2">, </span><span class="s1">newer</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+                <span class="s1">te</span><span class="s2">.</span><span class="s1">SetModified</span><span class="s2">();</span>
+            <span class="s2">}</span>
+            <span class="s0">catch </span><span class="s2">{ </span><span class="s4">/* best-effort; don’t crash the server */ </span><span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s0">public static void </span><span class="s1">HandleAction</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">EntityPlayer player</span><span class="s2">, </span><span class="s1">Vector3i blockPos</span><span class="s2">, </span><span class="s1">CasinoActionType action</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s1">var te </span><span class="s2">= </span><span class="s1">world</span><span class="s2">.</span><span class="s1">GetTileEntity</span><span class="s2">(</span><span class="s1">blockPos</span><span class="s2">) </span><span class="s0">as </span><span class="s1">TileEntityWorkstation</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">te </span><span class="s2">== </span><span class="s0">null</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+
+            <span class="s1">EnsureOutputSize</span><span class="s2">(</span><span class="s1">te</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">OutputSlots</span><span class="s2">);</span>
+            
+            <span class="s4">// Use the workstation's OUTPUT inventory as the winnings pool</span>
+            <span class="s1">var output </span><span class="s2">= </span><span class="s1">te</span><span class="s2">.</span><span class="s1">output</span><span class="s2">;</span>
+
+            <span class="s0">switch </span><span class="s2">(</span><span class="s1">action</span><span class="s2">)</span>
+            <span class="s2">{</span>
+                <span class="s0">case </span><span class="s1">CasinoActionType</span><span class="s2">.</span><span class="s1">Spin:</span>
+                    <span class="s1">DoSpin</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">player</span><span class="s2">, </span><span class="s1">te</span><span class="s2">, </span><span class="s1">output</span><span class="s2">);</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+                <span class="s0">case </span><span class="s1">CasinoActionType</span><span class="s2">.</span><span class="s1">DoubleOrNothing:</span>
+                    <span class="s1">DoDoubleOrNothing</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">player</span><span class="s2">, </span><span class="s1">te</span><span class="s2">, </span><span class="s1">output</span><span class="s2">);</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s1">te</span><span class="s2">.</span><span class="s1">SetModified</span><span class="s2">(); </span><span class="s4">// sync to clients</span>
+        <span class="s2">}</span>
+        
+        <span class="s0">static void </span><span class="s1">EnsureOutputSize</span><span class="s2">(</span><span class="s1">TileEntityWorkstation te</span><span class="s2">, </span><span class="s0">int </span><span class="s1">desired</span><span class="s2">)</span>
+<span class="s2">{</span>
+    <span class="s0">try</span>
+    <span class="s2">{</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">te</span><span class="s2">.</span><span class="s1">output </span><span class="s2">!= </span><span class="s0">null </span><span class="s2">&amp;&amp; </span><span class="s1">te</span><span class="s2">.</span><span class="s1">output</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">&gt;= </span><span class="s1">desired</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+
+        <span class="s1">var old </span><span class="s2">= </span><span class="s1">te</span><span class="s2">.</span><span class="s1">output ?? Array</span><span class="s2">.</span><span class="s1">Empty</span><span class="s2">&lt;</span><span class="s1">ItemStack</span><span class="s2">&gt;();</span>
+        <span class="s1">var newer </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">[</span><span class="s1">desired</span><span class="s2">];</span>
+        <span class="s1">var n </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">(</span><span class="s1">old</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">, </span><span class="s1">newer</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">);</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">n</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++) </span><span class="s1">newer</span><span class="s2">[</span><span class="s1">i</span><span class="s2">] = </span><span class="s1">old</span><span class="s2">[</span><span class="s1">i</span><span class="s2">];</span>
+
+        <span class="s4">// assign (direct or via reflection fallback)</span>
+        <span class="s0">try </span><span class="s2">{</span>
+            <span class="s1">te</span><span class="s2">.</span><span class="s1">output </span><span class="s2">= </span><span class="s1">newer</span><span class="s2">;</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">{</span>
+            <span class="s1">var f </span><span class="s2">= </span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">TileEntityWorkstation</span><span class="s2">).</span><span class="s1">GetField</span><span class="s2">(</span><span class="s5">&quot;output&quot;</span><span class="s2">,</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Instance </span><span class="s2">|</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Public </span><span class="s2">|</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">Reflection</span><span class="s2">.</span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">NonPublic</span><span class="s2">);</span>
+            <span class="s1">f?</span><span class="s2">.</span><span class="s1">SetValue</span><span class="s2">(</span><span class="s1">te</span><span class="s2">, </span><span class="s1">newer</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">te</span><span class="s2">.</span><span class="s1">SetModified</span><span class="s2">();</span>
+    <span class="s2">}</span>
+    <span class="s0">catch </span><span class="s2">{ </span><span class="s4">/* best-effort; don’t crash the server */ </span><span class="s2">}</span>
+<span class="s2">}</span>
+
+
+        <span class="s0">static void </span><span class="s1">DoSpin</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">EntityPlayer player</span><span class="s2">, </span><span class="s1">TileEntityWorkstation te</span><span class="s2">, </span><span class="s1">ItemStack</span><span class="s2">[] </span><span class="s1">output</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">!Util</span><span class="s2">.</span><span class="s1">TryTakeDukes</span><span class="s2">(</span><span class="s1">player</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">SpinCost</span><span class="s2">))</span>
+            <span class="s2">{</span>
+                <span class="s1">SdtdConsole</span><span class="s2">.</span><span class="s1">Instance</span><span class="s2">.</span><span class="s1">Output</span><span class="s2">(</span><span class="s5">$&quot;[Casino] Not enough dukes (</span><span class="s2">{</span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">SpinCost</span><span class="s2">}</span><span class="s5">).&quot;</span><span class="s2">);</span>
+                <span class="s0">return</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// Choose bucket</span>
+            <span class="s0">float </span><span class="s1">r </span><span class="s2">= (</span><span class="s0">float</span><span class="s2">)</span><span class="s1">Util</span><span class="s2">.</span><span class="s1">Rng</span><span class="s2">.</span><span class="s1">NextDouble</span><span class="s2">();</span>
+            <span class="s0">string </span><span class="s1">bucket</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">r </span><span class="s2">&lt; </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PBad</span><span class="s2">) </span><span class="s1">bucket </span><span class="s2">= </span><span class="s5">&quot;bad&quot;</span><span class="s2">;</span>
+            <span class="s0">else if </span><span class="s2">(</span><span class="s1">r </span><span class="s2">&lt; </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PBad </span><span class="s2">+ </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PReallyBad</span><span class="s2">) </span><span class="s1">bucket </span><span class="s2">= </span><span class="s5">&quot;reallybad&quot;</span><span class="s2">;</span>
+            <span class="s0">else if </span><span class="s2">(</span><span class="s1">r </span><span class="s2">&lt; </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PBad </span><span class="s2">+ </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PReallyBad </span><span class="s2">+ </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PGood</span><span class="s2">) </span><span class="s1">bucket </span><span class="s2">= </span><span class="s5">&quot;good&quot;</span><span class="s2">;</span>
+            <span class="s0">else </span><span class="s1">bucket </span><span class="s2">= </span><span class="s5">&quot;jackpot&quot;</span><span class="s2">;</span>
+
+            <span class="s0">bool </span><span class="s1">addedAny </span><span class="s2">= </span><span class="s0">false</span><span class="s2">;</span>
+
+            <span class="s0">switch </span><span class="s2">(</span><span class="s1">bucket</span><span class="s2">)</span>
+            <span class="s2">{</span>
+                <span class="s0">case </span><span class="s5">&quot;bad&quot;</span><span class="s1">:</span>
+                    <span class="s4">// Roll from the &quot;bad&quot; list using configured picks and bursts.</span>
+                    <span class="s4">// If you want &quot;pure nothing most of the time&quot;, set rolls_min/max low and keep a heavy-weight &quot;nothing&quot; entry in the Bad group.</span>
+                    <span class="s1">addedAny </span><span class="s2">= </span><span class="s1">RollGroupIntoOutput</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">te</span><span class="s2">, </span><span class="s1">output</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">Bad</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">BadRolls</span><span class="s2">);</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">!addedAny</span><span class="s2">)</span>
+                        <span class="s1">world</span><span class="s2">.</span><span class="s1">GetGameManager</span><span class="s2">().</span><span class="s1">PlaySoundAtPositionServer</span><span class="s2">(</span><span class="s5">&quot;ui_denied&quot;</span><span class="s2">, </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">().</span><span class="s1">ToVector3</span><span class="s2">());</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+
+                <span class="s0">case </span><span class="s5">&quot;reallybad&quot;</span><span class="s1">:</span>
+                <span class="s2">{</span>
+                    <span class="s0">float </span><span class="s1">rb </span><span class="s2">= (</span><span class="s0">float</span><span class="s2">)</span><span class="s1">Util</span><span class="s2">.</span><span class="s1">Rng</span><span class="s2">.</span><span class="s1">NextDouble</span><span class="s2">();</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">rb </span><span class="s2">&lt; </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PTilted</span><span class="s2">) </span><span class="s1">ApplyTilted</span><span class="s2">(</span><span class="s1">player</span><span class="s2">);</span>
+                    <span class="s0">else if </span><span class="s2">(</span><span class="s1">rb </span><span class="s2">&lt; </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PTilted </span><span class="s2">+ </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">PExplode</span><span class="s2">) </span><span class="s1">BlowUpMachine</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">te</span><span class="s2">);</span>
+                    <span class="s0">else </span><span class="s1">SpawnZombies</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">player</span><span class="s2">, </span><span class="s1">count: </span><span class="s3">2</span><span class="s2">);</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+                <span class="s2">}</span>
+
+                <span class="s0">case </span><span class="s5">&quot;good&quot;</span><span class="s1">:</span>
+                    <span class="s1">addedAny </span><span class="s2">= </span><span class="s1">RollGroupIntoOutput</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">te</span><span class="s2">, </span><span class="s1">output</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">Good</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">GoodRolls</span><span class="s2">);</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">addedAny</span><span class="s2">)</span>
+                        <span class="s1">world</span><span class="s2">.</span><span class="s1">GetGameManager</span><span class="s2">()</span>
+                            <span class="s2">.</span><span class="s1">PlaySoundAtPositionServer</span><span class="s2">(</span><span class="s5">&quot;ui_trader_purchase&quot;</span><span class="s2">, </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">().</span><span class="s1">ToVector3</span><span class="s2">());</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+
+                <span class="s0">case </span><span class="s5">&quot;jackpot&quot;</span><span class="s1">:</span>
+                    <span class="s1">addedAny </span><span class="s2">= </span><span class="s1">RollGroupIntoOutput</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">te</span><span class="s2">, </span><span class="s1">output</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">Jackpot</span><span class="s2">, </span><span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">JackpotRolls</span><span class="s2">);</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">addedAny</span><span class="s2">)</span>
+                        <span class="s1">world</span><span class="s2">.</span><span class="s1">GetGameManager</span><span class="s2">().</span><span class="s1">Instance</span><span class="s2">.</span><span class="s1">ChatMessageServer</span><span class="s2">(</span><span class="s0">null</span><span class="s2">, </span><span class="s5">$&quot;</span><span class="s2">{</span><span class="s1">player</span><span class="s2">.</span><span class="s1">EntityName</span><span class="s2">} </span><span class="s5">hit the JACKPOT!&quot;</span><span class="s2">, </span><span class="s5">&quot;800080&quot;</span><span class="s2">);</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s0">static void </span><span class="s1">DoDoubleOrNothing</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">EntityPlayer player</span><span class="s2">, </span><span class="s1">TileEntityWorkstation te</span><span class="s2">, </span><span class="s1">ItemStack</span><span class="s2">[] </span><span class="s1">output</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">bool </span><span class="s1">hasAny </span><span class="s2">= </span><span class="s0">false</span><span class="s2">;</span>
+            <span class="s0">foreach </span><span class="s2">(</span><span class="s1">var s </span><span class="s0">in </span><span class="s1">output</span><span class="s2">)</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">!s</span><span class="s2">.</span><span class="s1">IsEmpty</span><span class="s2">())</span>
+                <span class="s2">{</span>
+                    <span class="s1">hasAny </span><span class="s2">= </span><span class="s0">true</span><span class="s2">;</span>
+                    <span class="s0">break</span><span class="s2">;</span>
+                <span class="s2">}</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">!hasAny</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+
+            <span class="s0">bool </span><span class="s1">win </span><span class="s2">= </span><span class="s1">Util</span><span class="s2">.</span><span class="s1">Rng</span><span class="s2">.</span><span class="s1">NextDouble</span><span class="s2">() &lt; </span><span class="s3">0.5</span><span class="s2">; </span><span class="s4">// tweakable if you want</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">!win</span><span class="s2">)</span>
+            <span class="s2">{</span>
+                <span class="s1">Array</span><span class="s2">.</span><span class="s1">Clear</span><span class="s2">(</span><span class="s1">output</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s1">output</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">);</span>
+                <span class="s1">world</span><span class="s2">.</span><span class="s1">GetGameManager</span><span class="s2">().</span><span class="s1">PlaySoundAtPositionServer</span><span class="s2">(</span><span class="s5">&quot;ui_denied&quot;</span><span class="s2">, </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">().</span><span class="s1">ToVector3</span><span class="s2">());</span>
+                <span class="s0">return</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// Double each stack (respect stack limits; overflow tries to spread, then drop to world)</span>
+            <span class="s1">var toAdd </span><span class="s2">= </span><span class="s0">new </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">ItemStack</span><span class="s2">&gt;();</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">output</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++)</span>
+            <span class="s2">{</span>
+                <span class="s1">var stack </span><span class="s2">= </span><span class="s1">output</span><span class="s2">[</span><span class="s1">i</span><span class="s2">];</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">stack</span><span class="s2">.</span><span class="s1">IsEmpty</span><span class="s2">()) </span><span class="s0">continue</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">target </span><span class="s2">= </span><span class="s1">stack</span><span class="s2">.</span><span class="s1">count </span><span class="s2">* </span><span class="s3">2</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">clamp </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">(</span><span class="s1">target</span><span class="s2">, </span><span class="s1">stack</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">.</span><span class="s1">ItemClass</span><span class="s2">.</span><span class="s1">Stacknumber</span><span class="s2">.</span><span class="s1">Value</span><span class="s2">);</span>
+                <span class="s0">int </span><span class="s1">extra </span><span class="s2">= </span><span class="s1">target </span><span class="s2">- </span><span class="s1">clamp</span><span class="s2">;</span>
+                <span class="s1">stack</span><span class="s2">.</span><span class="s1">count </span><span class="s2">= </span><span class="s1">clamp</span><span class="s2">;</span>
+                <span class="s1">output</span><span class="s2">[</span><span class="s1">i</span><span class="s2">] = </span><span class="s1">stack</span><span class="s2">;</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">extra </span><span class="s2">&gt; </span><span class="s3">0</span><span class="s2">) </span><span class="s1">toAdd</span><span class="s2">.</span><span class="s1">Add</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">(</span><span class="s1">stack</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">, </span><span class="s1">extra</span><span class="s2">));</span>
+            <span class="s2">}</span>
+
+            <span class="s0">foreach </span><span class="s2">(</span><span class="s1">var add </span><span class="s0">in </span><span class="s1">toAdd</span><span class="s2">)</span>
+            <span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">!TryMergeInto</span><span class="s2">(</span><span class="s1">output</span><span class="s2">, </span><span class="s1">add</span><span class="s2">))</span>
+                    <span class="s1">world</span><span class="s2">.</span><span class="s1">gameManager</span><span class="s2">.</span><span class="s1">SpawnItemInWorld</span><span class="s2">(</span><span class="s1">add</span><span class="s2">, </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">().</span><span class="s1">ToVector3</span><span class="s2">() + </span><span class="s1">Vector3</span><span class="s2">.</span><span class="s1">up </span><span class="s2">* </span><span class="s3">1.2f</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+            <span class="s1">world</span><span class="s2">.</span><span class="s1">GetGameManager</span><span class="s2">().</span><span class="s1">PlaySoundAtPositionServer</span><span class="s2">(</span><span class="s5">&quot;ui_mission_complete&quot;</span><span class="s2">, </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">().</span><span class="s1">ToVector3</span><span class="s2">());</span>
+        <span class="s2">}</span>
+
+        <span class="s4">// === Loot rolling with picks + bursts (and optional unique draws) ===</span>
+        <span class="s0">static bool </span><span class="s1">RollGroupIntoOutput</span><span class="s2">(</span>
+            <span class="s1">World world</span><span class="s2">,</span>
+            <span class="s1">TileEntityWorkstation te</span><span class="s2">,</span>
+            <span class="s1">ItemStack</span><span class="s2">[] </span><span class="s1">output</span><span class="s2">,</span>
+            <span class="s1">List</span><span class="s2">&lt;</span><span class="s1">LootEntry</span><span class="s2">&gt; </span><span class="s1">group</span><span class="s2">,</span>
+            <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">BucketCfg cfg</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">group </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">group</span><span class="s2">.</span><span class="s1">Count </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) </span><span class="s0">return false</span><span class="s2">;</span>
+
+            <span class="s4">// Determine number of picks for this spin from this bucket</span>
+            <span class="s0">int </span><span class="s1">picks </span><span class="s2">= </span><span class="s1">UnityEngine</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">.</span><span class="s1">Range</span><span class="s2">(</span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s3">0</span><span class="s2">, </span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">), </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">, </span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">) + </span><span class="s3">1</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">picks </span><span class="s2">&lt;= </span><span class="s3">0</span><span class="s2">) </span><span class="s0">return false</span><span class="s2">;</span>
+
+            <span class="s4">// Optional unique draws per spin</span>
+            <span class="s1">List</span><span class="s2">&lt;</span><span class="s1">LootEntry</span><span class="s2">&gt; </span><span class="s1">pool </span><span class="s2">= </span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">Unique ? </span><span class="s0">new </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">LootEntry</span><span class="s2">&gt;(</span><span class="s1">group</span><span class="s2">) </span><span class="s1">: group</span><span class="s2">;</span>
+
+            <span class="s0">bool </span><span class="s1">any </span><span class="s2">= </span><span class="s0">false</span><span class="s2">;</span>
+
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">picks</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++)</span>
+            <span class="s2">{</span>
+                <span class="s4">// How many items to produce for THIS pick</span>
+                <span class="s0">int </span><span class="s1">burst </span><span class="s2">= </span><span class="s1">UnityEngine</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">.</span><span class="s1">Range</span><span class="s2">(</span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s3">1</span><span class="s2">, </span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">BurstMin</span><span class="s2">),</span>
+                    <span class="s1">Math</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">BurstMin</span><span class="s2">, </span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">BurstMax</span><span class="s2">) + </span><span class="s3">1</span><span class="s2">);</span>
+
+                <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">b </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">b </span><span class="s2">&lt; </span><span class="s1">burst</span><span class="s2">; </span><span class="s1">b</span><span class="s2">++)</span>
+                <span class="s2">{</span>
+                    <span class="s1">var e </span><span class="s2">= </span><span class="s1">Pick</span><span class="s2">(</span><span class="s1">pool</span><span class="s2">);</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">e </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">e</span><span class="s2">.</span><span class="s1">name </span><span class="s2">== </span><span class="s5">&quot;nothing&quot;</span><span class="s2">) </span><span class="s0">continue</span><span class="s2">;</span>
+
+                    <span class="s0">int </span><span class="s1">count </span><span class="s2">= </span><span class="s1">UnityEngine</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">.</span><span class="s1">Range</span><span class="s2">(</span><span class="s1">e</span><span class="s2">.</span><span class="s1">min</span><span class="s2">, </span><span class="s1">e</span><span class="s2">.</span><span class="s1">max </span><span class="s2">+ </span><span class="s3">1</span><span class="s2">);</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">count </span><span class="s2">&lt;= </span><span class="s3">0</span><span class="s2">) </span><span class="s0">continue</span><span class="s2">;</span>
+
+                    <span class="s1">GiveToOutput</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">te</span><span class="s2">, </span><span class="s1">output</span><span class="s2">, </span><span class="s1">e</span><span class="s2">.</span><span class="s1">name</span><span class="s2">, </span><span class="s1">count</span><span class="s2">);</span>
+                    <span class="s1">any </span><span class="s2">= </span><span class="s0">true</span><span class="s2">;</span>
+
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">Unique</span><span class="s2">)</span>
+                    <span class="s2">{</span>
+                        <span class="s4">// Remove this entry from the pool so we don't pick it again this spin</span>
+                        <span class="s4">// (Stops when pool empties)</span>
+                        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">idx </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">idx </span><span class="s2">&lt; </span><span class="s1">pool</span><span class="s2">.</span><span class="s1">Count</span><span class="s2">; </span><span class="s1">idx</span><span class="s2">++)</span>
+                        <span class="s2">{</span>
+                            <span class="s0">if </span><span class="s2">(</span><span class="s1">pool</span><span class="s2">[</span><span class="s1">idx</span><span class="s2">].</span><span class="s1">name </span><span class="s2">== </span><span class="s1">e</span><span class="s2">.</span><span class="s1">name</span><span class="s2">)</span>
+                            <span class="s2">{</span>
+                                <span class="s1">pool</span><span class="s2">.</span><span class="s1">RemoveAt</span><span class="s2">(</span><span class="s1">idx</span><span class="s2">);</span>
+                                <span class="s0">break</span><span class="s2">;</span>
+                            <span class="s2">}</span>
+                        <span class="s2">}</span>
+
+                        <span class="s0">if </span><span class="s2">(</span><span class="s1">pool</span><span class="s2">.</span><span class="s1">Count </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) </span><span class="s0">break</span><span class="s2">; </span><span class="s4">// out of unique options</span>
+                    <span class="s2">}</span>
+                <span class="s2">}</span>
+
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">cfg</span><span class="s2">.</span><span class="s1">Unique </span><span class="s2">&amp;&amp; </span><span class="s1">pool</span><span class="s2">.</span><span class="s1">Count </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) </span><span class="s0">break</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s0">return </span><span class="s1">any</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+        <span class="s0">static </span><span class="s1">LootEntry Pick</span><span class="s2">(</span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">LootEntry</span><span class="s2">&gt; </span><span class="s1">list</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">list </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">list</span><span class="s2">.</span><span class="s1">Count </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) </span><span class="s0">return null</span><span class="s2">;</span>
+            <span class="s0">int </span><span class="s1">sum </span><span class="s2">= </span><span class="s3">0</span><span class="s2">;</span>
+            <span class="s0">foreach </span><span class="s2">(</span><span class="s1">var e </span><span class="s0">in </span><span class="s1">list</span><span class="s2">) </span><span class="s1">sum </span><span class="s2">+= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">weight</span><span class="s2">;</span>
+            <span class="s0">int </span><span class="s1">roll </span><span class="s2">= </span><span class="s1">Util</span><span class="s2">.</span><span class="s1">Rng</span><span class="s2">.</span><span class="s1">Next</span><span class="s2">(</span><span class="s3">0</span><span class="s2">, </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s3">1</span><span class="s2">, </span><span class="s1">sum</span><span class="s2">));</span>
+            <span class="s0">int </span><span class="s1">acc </span><span class="s2">= </span><span class="s3">0</span><span class="s2">;</span>
+            <span class="s0">foreach </span><span class="s2">(</span><span class="s1">var e </span><span class="s0">in </span><span class="s1">list</span><span class="s2">)</span>
+            <span class="s2">{</span>
+                <span class="s1">acc </span><span class="s2">+= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">weight</span><span class="s2">;</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">roll </span><span class="s2">&lt; </span><span class="s1">acc</span><span class="s2">) </span><span class="s0">return </span><span class="s1">e</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s0">return </span><span class="s1">list</span><span class="s2">[</span><span class="s1">list</span><span class="s2">.</span><span class="s1">Count </span><span class="s2">- </span><span class="s3">1</span><span class="s2">];</span>
+        <span class="s2">}</span>
+
+
+        <span class="s0">static void </span><span class="s1">GiveToOutput</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">TileEntityWorkstation te</span><span class="s2">, </span><span class="s1">ItemStack</span><span class="s2">[] </span><span class="s1">output</span><span class="s2">, </span><span class="s0">string </span><span class="s1">name</span><span class="s2">, </span><span class="s0">int </span><span class="s1">count</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s1">var iv </span><span class="s2">= </span><span class="s1">ItemClass</span><span class="s2">.</span><span class="s1">GetItem</span><span class="s2">(</span><span class="s1">name</span><span class="s2">, </span><span class="s0">false</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">iv</span><span class="s2">.</span><span class="s1">IsEmpty</span><span class="s2">()) </span><span class="s0">return</span><span class="s2">;</span>
+
+            <span class="s1">var stack </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">(</span><span class="s1">iv</span><span class="s2">, </span><span class="s1">count</span><span class="s2">);</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">!TryMergeInto</span><span class="s2">(</span><span class="s1">output</span><span class="s2">, </span><span class="s1">stack</span><span class="s2">))</span>
+            <span class="s2">{</span>
+                <span class="s4">// Try empty slots</span>
+                <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">output</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">&amp;&amp; </span><span class="s1">stack</span><span class="s2">.</span><span class="s1">count </span><span class="s2">&gt; </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++)</span>
+                <span class="s2">{</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">!output</span><span class="s2">[</span><span class="s1">i</span><span class="s2">].</span><span class="s1">IsEmpty</span><span class="s2">()) </span><span class="s0">continue</span><span class="s2">;</span>
+                    <span class="s0">int </span><span class="s1">max </span><span class="s2">= </span><span class="s1">iv</span><span class="s2">.</span><span class="s1">ItemClass</span><span class="s2">.</span><span class="s1">Stacknumber</span><span class="s2">.</span><span class="s1">Value</span><span class="s2">;</span>
+                    <span class="s0">int </span><span class="s1">move </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">(</span><span class="s1">max</span><span class="s2">, </span><span class="s1">stack</span><span class="s2">.</span><span class="s1">count</span><span class="s2">);</span>
+                    <span class="s1">output</span><span class="s2">[</span><span class="s1">i</span><span class="s2">] = </span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">(</span><span class="s1">iv</span><span class="s2">, </span><span class="s1">move</span><span class="s2">);</span>
+                    <span class="s1">stack</span><span class="s2">.</span><span class="s1">count </span><span class="s2">-= </span><span class="s1">move</span><span class="s2">;</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// Spill to world if still leftover</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">stack</span><span class="s2">.</span><span class="s1">count </span><span class="s2">&gt; </span><span class="s3">0</span><span class="s2">)</span>
+                <span class="s1">world</span><span class="s2">.</span><span class="s1">gameManager</span><span class="s2">.</span><span class="s1">SpawnItemInWorld</span><span class="s2">(</span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">(</span><span class="s1">iv</span><span class="s2">, </span><span class="s1">stack</span><span class="s2">.</span><span class="s1">count</span><span class="s2">),</span>
+                    <span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">().</span><span class="s1">ToVector3</span><span class="s2">() + </span><span class="s1">Vector3</span><span class="s2">.</span><span class="s1">up </span><span class="s2">* </span><span class="s3">1.2f</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s0">static bool </span><span class="s1">TryMergeInto</span><span class="s2">(</span><span class="s1">ItemStack</span><span class="s2">[] </span><span class="s1">grid</span><span class="s2">, </span><span class="s1">ItemStack add</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s4">// merge with same item</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">grid</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">&amp;&amp; </span><span class="s1">add</span><span class="s2">.</span><span class="s1">count </span><span class="s2">&gt; </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++)</span>
+            <span class="s2">{</span>
+                <span class="s1">var s </span><span class="s2">= </span><span class="s1">grid</span><span class="s2">[</span><span class="s1">i</span><span class="s2">];</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">s</span><span class="s2">.</span><span class="s1">IsEmpty</span><span class="s2">()) </span><span class="s0">continue</span><span class="s2">;</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">!s</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">.</span><span class="s1">Equals</span><span class="s2">(</span><span class="s1">add</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">)) </span><span class="s0">continue</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">max </span><span class="s2">= </span><span class="s1">s</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">.</span><span class="s1">ItemClass</span><span class="s2">.</span><span class="s1">Stacknumber</span><span class="s2">.</span><span class="s1">Value</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">space </span><span class="s2">= </span><span class="s1">max </span><span class="s2">- </span><span class="s1">s</span><span class="s2">.</span><span class="s1">count</span><span class="s2">;</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">space </span><span class="s2">&lt;= </span><span class="s3">0</span><span class="s2">) </span><span class="s0">continue</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">move </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">(</span><span class="s1">space</span><span class="s2">, </span><span class="s1">add</span><span class="s2">.</span><span class="s1">count</span><span class="s2">);</span>
+                <span class="s1">s</span><span class="s2">.</span><span class="s1">count </span><span class="s2">+= </span><span class="s1">move</span><span class="s2">;</span>
+                <span class="s1">grid</span><span class="s2">[</span><span class="s1">i</span><span class="s2">] = </span><span class="s1">s</span><span class="s2">;</span>
+                <span class="s1">add</span><span class="s2">.</span><span class="s1">count </span><span class="s2">-= </span><span class="s1">move</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// fill empties</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">grid</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">&amp;&amp; </span><span class="s1">add</span><span class="s2">.</span><span class="s1">count </span><span class="s2">&gt; </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++)</span>
+            <span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">!grid</span><span class="s2">[</span><span class="s1">i</span><span class="s2">].</span><span class="s1">IsEmpty</span><span class="s2">()) </span><span class="s0">continue</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">max </span><span class="s2">= </span><span class="s1">add</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">.</span><span class="s1">ItemClass</span><span class="s2">.</span><span class="s1">Stacknumber</span><span class="s2">.</span><span class="s1">Value</span><span class="s2">;</span>
+                <span class="s0">int </span><span class="s1">move </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">Min</span><span class="s2">(</span><span class="s1">max</span><span class="s2">, </span><span class="s1">add</span><span class="s2">.</span><span class="s1">count</span><span class="s2">);</span>
+                <span class="s1">grid</span><span class="s2">[</span><span class="s1">i</span><span class="s2">] = </span><span class="s0">new </span><span class="s1">ItemStack</span><span class="s2">(</span><span class="s1">add</span><span class="s2">.</span><span class="s1">itemValue</span><span class="s2">, </span><span class="s1">move</span><span class="s2">);</span>
+                <span class="s1">add</span><span class="s2">.</span><span class="s1">count </span><span class="s2">-= </span><span class="s1">move</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s0">return </span><span class="s1">add</span><span class="s2">.</span><span class="s1">count </span><span class="s2">&lt;= </span><span class="s3">0</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+        <span class="s4">// === Really Bad effects ===</span>
+        <span class="s0">static void </span><span class="s1">ApplyTilted</span><span class="s2">(</span><span class="s1">EntityPlayer player</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s1">player</span><span class="s2">.</span><span class="s1">Buffs?</span><span class="s2">.</span><span class="s1">AddBuff</span><span class="s2">(</span><span class="s5">&quot;buffCasinoTilted&quot;</span><span class="s2">);</span>
+            <span class="s1">GameManager</span><span class="s2">.</span><span class="s1">Instance</span><span class="s2">.</span><span class="s1">ChatMessageServer</span><span class="s2">(</span><span class="s0">null</span><span class="s2">, </span><span class="s5">$&quot;</span><span class="s2">{</span><span class="s1">player</span><span class="s2">.</span><span class="s1">EntityName</span><span class="s2">} </span><span class="s5">is TILTED!&quot;</span><span class="s2">, </span><span class="s5">&quot;FFAA00&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s0">static void </span><span class="s1">BlowUpMachine</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">TileEntity te</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s1">var pos </span><span class="s2">= </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ToWorldPos</span><span class="s2">();</span>
+            <span class="s1">world</span><span class="s2">.</span><span class="s1">GetGameManager</span><span class="s2">().</span><span class="s1">PlaySoundAtPositionServer</span><span class="s2">(</span><span class="s5">&quot;explosion_small&quot;</span><span class="s2">, </span><span class="s1">pos</span><span class="s2">.</span><span class="s1">ToVector3</span><span class="s2">());</span>
+            <span class="s1">world</span><span class="s2">.</span><span class="s1">SetBlockRPC</span><span class="s2">(</span><span class="s1">pos</span><span class="s2">, </span><span class="s1">BlockValue</span><span class="s2">.</span><span class="s1">Air</span><span class="s2">); </span><span class="s4">// destroy the block cleanly</span>
+
+            <span class="s1">RagdollBurst</span><span class="s2">(</span><span class="s1">world</span><span class="s2">, </span><span class="s1">pos</span><span class="s2">.</span><span class="s1">ToVector3</span><span class="s2">() + </span><span class="s1">Vector3</span><span class="s2">.</span><span class="s1">up </span><span class="s2">* </span><span class="s3">0.5f</span><span class="s2">,</span>
+                <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">RagdollRadius</span><span class="s2">,</span>
+                <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">RagdollBaseForce</span><span class="s2">,</span>
+                <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">RagdollUpward</span><span class="s2">,</span>
+                <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">RagdollDuration</span><span class="s2">,</span>
+                <span class="s1">CasinoConfig</span><span class="s2">.</span><span class="s1">RagdollFalloff</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s0">static void </span><span class="s1">SpawnZombies</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">EntityPlayer player</span><span class="s2">, </span><span class="s0">int </span><span class="s1">count</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">string</span><span class="s2">[] </span><span class="s1">pool </span><span class="s2">= { </span><span class="s5">&quot;zombieArlene&quot;</span><span class="s2">, </span><span class="s5">&quot;zombieBoe&quot;</span><span class="s2">, </span><span class="s5">&quot;zombieYo&quot; </span><span class="s2">};</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&lt; </span><span class="s1">count</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++)</span>
+            <span class="s2">{</span>
+                <span class="s1">var name </span><span class="s2">= </span><span class="s1">pool</span><span class="s2">[</span><span class="s1">UnityEngine</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">.</span><span class="s1">Range</span><span class="s2">(</span><span class="s3">0</span><span class="s2">, </span><span class="s1">pool</span><span class="s2">.</span><span class="s1">Length</span><span class="s2">)];</span>
+                <span class="s0">int </span><span class="s1">cls </span><span class="s2">= </span><span class="s1">EntityClass</span><span class="s2">.</span><span class="s1">FromString</span><span class="s2">(</span><span class="s1">name</span><span class="s2">);</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">cls </span><span class="s2">&lt; </span><span class="s3">0</span><span class="s2">) </span><span class="s0">continue</span><span class="s2">;</span>
+                <span class="s1">var pos </span><span class="s2">= </span><span class="s1">player</span><span class="s2">.</span><span class="s1">position </span><span class="s2">+</span>
+                          <span class="s0">new </span><span class="s1">Vector3</span><span class="s2">(</span><span class="s1">UnityEngine</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">.</span><span class="s1">Range</span><span class="s2">(-</span><span class="s3">2</span><span class="s2">, </span><span class="s3">3</span><span class="s2">), </span><span class="s3">0</span><span class="s2">, </span><span class="s1">UnityEngine</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">.</span><span class="s1">Range</span><span class="s2">(-</span><span class="s3">2</span><span class="s2">, </span><span class="s3">3</span><span class="s2">));</span>
+                <span class="s1">var ent </span><span class="s2">= </span><span class="s1">EntityFactory</span><span class="s2">.</span><span class="s1">CreateEntity</span><span class="s2">(</span><span class="s1">cls</span><span class="s2">, </span><span class="s1">pos</span><span class="s2">);</span>
+                <span class="s1">world</span><span class="s2">.</span><span class="s1">SpawnEntityInWorld</span><span class="s2">(</span><span class="s1">ent</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s0">static void </span><span class="s1">RagdollBurst</span><span class="s2">(</span><span class="s1">World world</span><span class="s2">, </span><span class="s1">Vector3 origin</span><span class="s2">, </span><span class="s0">float </span><span class="s1">radius</span><span class="s2">, </span><span class="s0">float </span><span class="s1">baseForce</span><span class="s2">, </span><span class="s0">float </span><span class="s1">upwardBias</span><span class="s2">,</span>
+            <span class="s0">float </span><span class="s1">duration</span><span class="s2">, </span><span class="s0">string </span><span class="s1">falloff</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s4">// Grab all players we can see (server-side)</span>
+            <span class="s1">var players </span><span class="s2">= </span><span class="s1">GameManager</span><span class="s2">.</span><span class="s1">Instance</span><span class="s2">.</span><span class="s1">World?</span><span class="s2">.</span><span class="s1">Players?</span><span class="s2">.</span><span class="s1">list</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">players </span><span class="s2">== </span><span class="s0">null</span><span class="s2">) </span><span class="s0">return</span><span class="s2">;</span>
+
+            <span class="s0">foreach </span><span class="s2">(</span><span class="s1">var ep </span><span class="s0">in </span><span class="s1">players</span><span class="s2">)</span>
+            <span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">ep </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">ep</span><span class="s2">.</span><span class="s1">IsDead</span><span class="s2">()) </span><span class="s0">continue</span><span class="s2">;</span>
+
+                <span class="s1">var toPlayer </span><span class="s2">= </span><span class="s1">ep</span><span class="s2">.</span><span class="s1">position </span><span class="s2">- </span><span class="s1">origin</span><span class="s2">;</span>
+                <span class="s0">float </span><span class="s1">dist </span><span class="s2">= </span><span class="s1">toPlayer</span><span class="s2">.</span><span class="s1">magnitude</span><span class="s2">;</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">dist </span><span class="s2">&gt; </span><span class="s1">radius</span><span class="s2">) </span><span class="s0">continue</span><span class="s2">;</span>
+
+                <span class="s4">// Scale force by distance if using linear falloff</span>
+                <span class="s0">float </span><span class="s1">scale </span><span class="s2">= </span><span class="s3">1f</span><span class="s2">;</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s0">string</span><span class="s2">.</span><span class="s1">Equals</span><span class="s2">(</span><span class="s1">falloff</span><span class="s2">, </span><span class="s5">&quot;linear&quot;</span><span class="s2">, </span><span class="s1">System</span><span class="s2">.</span><span class="s1">StringComparison</span><span class="s2">.</span><span class="s1">OrdinalIgnoreCase</span><span class="s2">))</span>
+                    <span class="s1">scale </span><span class="s2">= </span><span class="s1">Mathf</span><span class="s2">.</span><span class="s1">Clamp01</span><span class="s2">(</span><span class="s3">1f </span><span class="s2">- (</span><span class="s1">dist </span><span class="s2">/ </span><span class="s1">Mathf</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s3">0.001f</span><span class="s2">, </span><span class="s1">radius</span><span class="s2">)));</span>
+
+                <span class="s1">var dir </span><span class="s2">= (</span><span class="s1">dist </span><span class="s2">&gt; </span><span class="s3">0.01f </span><span class="s1">? toPlayer</span><span class="s2">.</span><span class="s1">normalized : Vector3</span><span class="s2">.</span><span class="s1">forward</span><span class="s2">);</span>
+                <span class="s1">var push </span><span class="s2">= (</span><span class="s1">dir </span><span class="s2">+ </span><span class="s1">Vector3</span><span class="s2">.</span><span class="s1">up </span><span class="s2">* </span><span class="s1">Mathf</span><span class="s2">.</span><span class="s1">Clamp01</span><span class="s2">(</span><span class="s1">upwardBias</span><span class="s2">)).</span><span class="s1">normalized </span><span class="s2">* (</span><span class="s1">baseForce </span><span class="s2">* </span><span class="s1">scale</span><span class="s2">);</span>
+
+                <span class="s1">TryRagdollAndPush</span><span class="s2">(</span><span class="s1">ep</span><span class="s2">, </span><span class="s1">push</span><span class="s2">, </span><span class="s1">duration</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+<span class="s4">// Try multiple strategies to ragdoll + impulse the player so this keeps working across minor builds:</span>
+        <span class="s0">static void </span><span class="s1">TryRagdollAndPush</span><span class="s2">(</span><span class="s1">EntityPlayer ep</span><span class="s2">, </span><span class="s1">Vector3 push</span><span class="s2">, </span><span class="s0">float </span><span class="s1">durationSec</span><span class="s2">)</span>
+        <span class="s2">{</span>
+            <span class="s0">bool </span><span class="s1">ragdolled </span><span class="s2">= </span><span class="s0">false</span><span class="s2">;</span>
+
+            <span class="s4">// 1) Preferred: call an internal ragdoll method if it exists (names differ across builds).</span>
+            <span class="s0">try</span>
+            <span class="s2">{</span>
+                <span class="s4">// Common possibilities across versions:</span>
+                <span class="s4">// StartRagdoll(float seconds), StartRagdoll(Vector3 force, float seconds),</span>
+                <span class="s4">// SetRagdoll(bool), or SetRagdollState(bool)</span>
+                <span class="s1">var t </span><span class="s2">= </span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">EntityAlive</span><span class="s2">);</span>
+
+                <span class="s1">MethodInfo m </span><span class="s2">=</span>
+                    <span class="s1">t</span><span class="s2">.</span><span class="s1">GetMethod</span><span class="s2">(</span><span class="s5">&quot;StartRagdoll&quot;</span><span class="s2">, </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Instance </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Public </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">NonPublic</span><span class="s2">,</span>
+                        <span class="s0">null</span><span class="s2">, </span><span class="s0">new</span><span class="s2">[] { </span><span class="s0">typeof</span><span class="s2">(</span><span class="s0">float</span><span class="s2">) }, </span><span class="s0">null</span><span class="s2">)</span>
+                    <span class="s1">?? t</span><span class="s2">.</span><span class="s1">GetMethod</span><span class="s2">(</span><span class="s5">&quot;StartRagdoll&quot;</span><span class="s2">, </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Instance </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Public </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">NonPublic</span><span class="s2">,</span>
+                        <span class="s0">null</span><span class="s2">, </span><span class="s0">new</span><span class="s2">[] { </span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">Vector3</span><span class="s2">), </span><span class="s0">typeof</span><span class="s2">(</span><span class="s0">float</span><span class="s2">) }, </span><span class="s0">null</span><span class="s2">)</span>
+                    <span class="s1">?? t</span><span class="s2">.</span><span class="s1">GetMethod</span><span class="s2">(</span><span class="s5">&quot;SetRagdoll&quot;</span><span class="s2">, </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Instance </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Public </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">NonPublic</span><span class="s2">,</span>
+                        <span class="s0">null</span><span class="s2">, </span><span class="s0">new</span><span class="s2">[] { </span><span class="s0">typeof</span><span class="s2">(</span><span class="s0">bool</span><span class="s2">) }, </span><span class="s0">null</span><span class="s2">)</span>
+                    <span class="s1">?? t</span><span class="s2">.</span><span class="s1">GetMethod</span><span class="s2">(</span><span class="s5">&quot;SetRagdollState&quot;</span><span class="s2">,</span>
+                        <span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Instance </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">Public </span><span class="s2">| </span><span class="s1">BindingFlags</span><span class="s2">.</span><span class="s1">NonPublic</span><span class="s2">, </span><span class="s0">null</span><span class="s2">,</span>
+                        <span class="s0">new</span><span class="s2">[] { </span><span class="s0">typeof</span><span class="s2">(</span><span class="s0">bool</span><span class="s2">) }, </span><span class="s0">null</span><span class="s2">);</span>
+
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">m </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">)</span>
+                <span class="s2">{</span>
+                    <span class="s1">var ps </span><span class="s2">= </span><span class="s1">m</span><span class="s2">.</span><span class="s1">GetParameters</span><span class="s2">();</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">ps</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">== </span><span class="s3">2 </span><span class="s2">&amp;&amp; </span><span class="s1">ps</span><span class="s2">[</span><span class="s3">0</span><span class="s2">].</span><span class="s1">ParameterType </span><span class="s2">== </span><span class="s0">typeof</span><span class="s2">(</span><span class="s1">Vector3</span><span class="s2">))</span>
+                        <span class="s1">m</span><span class="s2">.</span><span class="s1">Invoke</span><span class="s2">(</span><span class="s1">ep</span><span class="s2">, </span><span class="s0">new object</span><span class="s2">[] { </span><span class="s1">push</span><span class="s2">, </span><span class="s1">durationSec </span><span class="s2">});</span>
+                    <span class="s0">else if </span><span class="s2">(</span><span class="s1">ps</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">== </span><span class="s3">1 </span><span class="s2">&amp;&amp; </span><span class="s1">ps</span><span class="s2">[</span><span class="s3">0</span><span class="s2">].</span><span class="s1">ParameterType </span><span class="s2">== </span><span class="s0">typeof</span><span class="s2">(</span><span class="s0">float</span><span class="s2">))</span>
+                        <span class="s1">m</span><span class="s2">.</span><span class="s1">Invoke</span><span class="s2">(</span><span class="s1">ep</span><span class="s2">, </span><span class="s0">new object</span><span class="s2">[] { </span><span class="s1">durationSec </span><span class="s2">});</span>
+                    <span class="s0">else if </span><span class="s2">(</span><span class="s1">ps</span><span class="s2">.</span><span class="s1">Length </span><span class="s2">== </span><span class="s3">1 </span><span class="s2">&amp;&amp; </span><span class="s1">ps</span><span class="s2">[</span><span class="s3">0</span><span class="s2">].</span><span class="s1">ParameterType </span><span class="s2">== </span><span class="s0">typeof</span><span class="s2">(</span><span class="s0">bool</span><span class="s2">))</span>
+                        <span class="s1">m</span><span class="s2">.</span><span class="s1">Invoke</span><span class="s2">(</span><span class="s1">ep</span><span class="s2">, </span><span class="s0">new object</span><span class="s2">[] { </span><span class="s0">true </span><span class="s2">});</span>
+                    <span class="s1">ragdolled </span><span class="s2">= </span><span class="s0">true</span><span class="s2">;</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+            <span class="s0">catch</span>
+            <span class="s2">{</span>
+                <span class="s4">/* best-effort */</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// 2) Apply a “stun/knockdown” style buff if available (encourages ragdoll in some builds)</span>
+            <span class="s0">try</span>
+            <span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">!ragdolled</span><span class="s2">)</span>
+                    <span class="s1">ep</span><span class="s2">.</span><span class="s1">Buffs?</span><span class="s2">.</span><span class="s1">AddBuff</span><span class="s2">(</span><span class="s5">&quot;buffStunned&quot;</span><span class="s2">); </span><span class="s4">// if your build has a different name, update it</span>
+            <span class="s2">}</span>
+            <span class="s0">catch</span>
+            <span class="s2">{</span>
+                <span class="s4">/* optional */</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// 3) Impulse / knockback: use DamageEntity with explosion-type source (safe in most builds)</span>
+            <span class="s0">try</span>
+            <span class="s2">{</span>
+                <span class="s1">var ds </span><span class="s2">= </span><span class="s0">new </span><span class="s1">DamageSource</span><span class="s2">(</span><span class="s1">DamageSourceType</span><span class="s2">.</span><span class="s1">Explosion</span><span class="s2">);</span>
+                <span class="s4">// Strength=1 (tiny) + large impulse scales better than large damage.</span>
+                <span class="s4">// Last param is often &quot;impulseScale&quot; in recent builds.</span>
+                <span class="s1">ep</span><span class="s2">.</span><span class="s1">DamageEntity</span><span class="s2">(</span><span class="s1">ds</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s0">false</span><span class="s2">, </span><span class="s1">Mathf</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s3">1f</span><span class="s2">, </span><span class="s1">push</span><span class="s2">.</span><span class="s1">magnitude </span><span class="s2">* </span><span class="s3">2f</span><span class="s2">));</span>
+            <span class="s2">}</span>
+            <span class="s0">catch</span>
+            <span class="s2">{</span>
+                <span class="s4">/* some builds have different signature; we add another try below */</span>
+            <span class="s2">}</span>
+
+            <span class="s4">// 4) Last resort push via motion (small nudge even if ragdoll didn’t trigger)</span>
+            <span class="s0">try</span>
+            <span class="s2">{</span>
+                <span class="s4">// Give them a little pop in the intended direction</span>
+                <span class="s1">ep</span><span class="s2">.</span><span class="s1">motion </span><span class="s2">+= </span><span class="s0">new </span><span class="s1">Vector3</span><span class="s2">(</span><span class="s1">push</span><span class="s2">.</span><span class="s1">x</span><span class="s2">, </span><span class="s1">Mathf</span><span class="s2">.</span><span class="s1">Max</span><span class="s2">(</span><span class="s3">0.1f</span><span class="s2">, </span><span class="s1">push</span><span class="s2">.</span><span class="s1">y</span><span class="s2">), </span><span class="s1">push</span><span class="s2">.</span><span class="s1">z</span><span class="s2">);</span>
+            <span class="s2">}</span>
+            <span class="s0">catch</span>
+            <span class="s2">{</span>
+                <span class="s4">/* okay to ignore */</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
