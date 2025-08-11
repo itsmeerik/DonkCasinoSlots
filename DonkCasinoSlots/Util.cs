@@ -7,31 +7,38 @@ namespace DonkCasinoSlots
     {
         public static readonly System.Random Rng = new System.Random();
 
-        public static bool TryTakeDukes(EntityPlayer player, int amount)
+
+        static bool HasEnoughDukes(EntityPlayer player, int amount)
         {
-            var needed = amount;
-            var inv = player.bag;
-            for (int i = 0; i < inv.GetSlotsCount(); i++)
-            {
-                var stack = inv.GetSlotItem(i);
-                if (stack.IsEmpty()) continue;
-                if (stack.itemValue.ItemClass.Name != "casinoCoin") continue;
-                int take = Math.Min(needed, stack.count);
-                if (take <= 0) break;
-                inv.DecItemCount(i, take);
-                needed -= take;
-                if (needed <= 0) break;
-            }
-            return needed <= 0;
+            if (player == null || amount <= 0) return false;
+            var bag = player.bag as Bag;
+            if (bag == null) return false;
+
+            var dukes = ItemClass.GetItem("casinoCoin", false);
+            if (dukes.IsEmpty()) return false;
+
+            int have = bag.GetItemCount(dukes);
+            return have >= amount;
         }
 
-        public static void SendCasinoAction(XUiC_WorkstationWindowGroup ui, CasinoActionType type)
+        public static bool TryTakeDukes(EntityPlayer player, int amount)
         {
-            // Grab the block position for this workstation
-            var te = ui?.tileEntity as TileEntityWorkstation;
-            if (te == null) return;
-            var pos = te.ToWorldPos();
-            var pkg = NetPackageManager.GetPackage<NetPackageCasinoAction>().Setup(type, pos);
+            if (player == null || amount <= 0) return false;
+            var bag = player.bag as Bag;
+            if (bag == null) return false;
+
+            var dukes = ItemClass.GetItem("casinoCoin", false);
+            if (dukes.IsEmpty()) return false;
+
+            // Remove up to 'amount' dukes by ItemValue type.
+            // Returns the number actually removed.
+            int removed = bag.DecItem(dukes, amount, /*_ignoreModdedItems:*/ false, /*_removedItems:*/ null);
+            return removed >= amount;
+        }
+
+        public static void SendCasinoAction(CasinoActionType type)
+        {
+            var pkg = NetPackageManager.GetPackage<NetPackageCasinoAction>().Setup(type);
             ConnectionManager.Instance.SendToServer(pkg);
         }
 

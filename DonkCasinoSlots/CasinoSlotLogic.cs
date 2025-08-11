@@ -6,7 +6,7 @@ namespace DonkCasinoSlots
 {
     public static class CasinoSlotLogic
     {
-        static void EnsureOutputSize(TileEntityWorkstation te, int desired)
+        public static void EnsureOutputSize(TileEntityWorkstation te, int desired)
         {
             try
             {

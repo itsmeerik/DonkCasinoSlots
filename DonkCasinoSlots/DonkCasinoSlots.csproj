@@ -14,8 +14,8 @@
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <!-- Change these if your Steam path differs -->
-        <GameRoot>C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die</GameRoot>
-        <Managed>$(GameRoot)\7DaysToDie_Data\Managed</Managed>
+        <GameRoot>/Users/brokeboi/Library/Application Support/Steam\steamapps\common\7 Days To Die</GameRoot>
+        <Managed>$(GameRoot)/7DaysToDie.app/Contents/Resources/Data/Managed</Managed>
 
         <!-- Build directly into the game Mods folder -->
         <OutputPath>$(GameRoot)\Mods\DonkCasinoSlots\Harmony\</OutputPath>
@@ -50,13 +50,12 @@
         <Compile Include="CasinoSlotLogic.cs" />
         <Compile Include="ModEntry.cs" />
         <Compile Include="NetPackageCasinoSlotAction.cs" />
-        <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="Util.cs" />
     </ItemGroup>
     <ItemGroup>
         <Reference Include="0Harmony">
-            <HintPath>$(Managed)\0Harmony.dll</HintPath>
+            <HintPath>$(GameRoot)\Mods\0_TFP_Harmony\0Harmony.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="Assembly-CSharp">
