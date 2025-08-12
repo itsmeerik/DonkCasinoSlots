@@ -2,17 +2,57 @@
 <config>
     <append xpath="/blocks">
         <block name="cntCasinoSlot">
-            <property name="Extends" value="cntVendingMachine"/>
+            <!-- Class -->
             <property name="Class" value="Workstation"/>
-            <property name="Workstation" value="casino_slot"/>
+            <property class="Workstation" value="casino_slot">
+                <!-- Only need an output bin; the code fills it -->
+                <property name="Modules" value="output"/>
+                <!-- lets the window open + “craft” (spin) in our custom bench -->
+                <property name="CraftingAreaRecipes" value="player,workbench"/>
+            </property>
+
+            <!-- UI_Info -->
             <property name="CreativeMode" value="Player"/>
-            <property name="PickupAllowed" value="false"/>
-            <property name="MaxDamage" value="400"/>
-            <property name="DamageReceived" value="entities:1,explosion:4,melee:1,bullet:1,fire:2"/>
-            <property name="ShowInspectionWindow" value="true"/>
+            <property name="DescriptionKey" value="cntCasinoSlotDesc"/>
+            <property name="DisplayType" value="blockMulti"/>
+            <property name="WorkstationIcon" value="ui_game_symbol_vending"/>
+            <property name="Stacknumber" value="1"/>
             <property name="CustomIcon" value="cntVendingMachine"/>
-            <property name="IsTrader" value="false"/>
-            <property name="TraderArea" value="false"/>
+
+
+            <!-- Visual -->
+            <property name="Material" value="Mmetal_medium"/>
+            <property name="Shape" value="ModelEntity"/>
+            <property name="Model" value="@:Entities/Commercial/vendingMachinePlayerPrefab.prefab"/>
+            <property name="ModelOffset" value="0,0,0"/>
+
+            <!-- Interaction -->
+            <property name="MaxDamage" value="800"/>
+            <property name="HeatMapStrength" value="5"/>
+            <property name="HeatMapTime" value="5000"/>
+            <property name="HeatMapFrequency" value="1000"/>
+            <property name="OpenSound" value="open_workbench"/>
+            <property name="CloseSound" value="close_workbench"/>
+            <property name="TakeDelay" value="15"/>
+
+            <!-- Placement -->
+            <property name="Place" value="TowardsPlacerInverted"/>
+            <property name="OnlySimpleRotations" value="true"/>
+            <property name="Collide" value="sight,movement,melee,bullet,arrow,rocket"/>
+            <property name="Path" value="solid"/>
+            <property name="StabilitySupport" value="false"/>
+            <property name="EconomicValue" value="2000"/>
+            <property name="TraderID" value="3"/>
+            <property name="TraderStageTemplate" value="midTier1"/><!-- cntVendingMachine -->
+            <property name="Buff" value="buffShocked"/>
+            <property class="RepairItems">
+                <property name="resourceForgedIron" value="5"/>
+            </property>
+            <drop event="Destroy" count="0"/>
+            <property name="SortOrder1" value="B456"/>
+            <property name="SortOrder2" value="0000"/>
+            <property name="Group" value="Science,TCScience"/>
+            <property name="FilterTags" value="MC_playerBlocks,SC_electrical"/>
         </block>
     </append>
 </config>

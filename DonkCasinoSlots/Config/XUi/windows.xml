@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<configs>
+<config>
     <append xpath="/windows">
-        <window_group name="workstation_casino_slot" controller="XUiC_WorkstationWindowGroup">
-            <!-- Clone the basic workbench layout but make a big output grid and add two buttons -->
-            <window name="workstation_casino_slot" controller="XUiC_WorkstationWindow" panel="true">
-                <rect depth="0" pos="0,0" size="700,520" visible="true" />
-                <!-- Title -->
-                <label style="header" text="Casino Slot Machine" pos="20,-30"/>
-                <!-- Ingredients (unused but left for flavor / future) -->
-                <grid name="ingredient_grid" cols="5" rows="1" slot_grid="true" pos="20,-70" cell_width="60" cell_height="60"/>
-                <!-- Winnings grid (what matters) -->
-                <label text="Winnings" pos="20,-140" style="header_small"/>
-                <grid name="output" cols="7" rows="5" slot_grid="true" pos="20,-170" cell_width="60" cell_height="60"/>
-                <!-- Buttons -->
-                <button name="btnCasinoSpin"   text="Spin (500 Dukes)" pos="520,-70"  width="160" height="40"/>
-                <button name="btnCasinoDouble" text="Double or Nothing" pos="520,-120" width="160" height="40"/>
+        <window_group name="workstation_cntCasinoSlot" extends="workstation_workbench">
+            <window name="workstation_cntCasinoSlot" extends="workstation_workbench">
+                <!-- Action bar with your two buttons -->
+                <panel name="casino_actions" anchor="RightBottom" halign="right" valign="bottom"
+                       width="360" height="40" depth="200" pad="8,4">
+                    <button name="btnCasinoSpin"   width="130" height="36" pos="-260,0" text_key="uiCasinoSpin"/>
+                    <button name="btnCasinoDouble" width="190" height="36" pos="-120,0" text_key="uiCasinoDouble"/>
+                </panel>
             </window>
         </window_group>
     </append>
-</configs>
+
+    <!-- Optional: header tweaks for OUR window only -->
+    <set xpath="/windows/window_group[@name='workstation_cntCasinoSlot']/window[@name='workstation_cntCasinoSlot']/panel[@name='header']/sprite[@name='windowIcon']/@sprite">
+        ui_game_symbol_vending
+    </set>
+    <set xpath="/windows/window_group[@name='workstation_cntCasinoSlot']/window[@name='workstation_cntCasinoSlot']/panel[@name='header']/label[1]/@text_key">
+        workstation_casino_slot
+    </set>
+</config>

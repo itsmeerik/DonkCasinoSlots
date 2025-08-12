@@ -1,3 +1,15 @@
-casinoTilted_name,Tilted,Tilted,You feel rattled after losing savings.
-casinoTilted_desc,Take +50% damage; hunger/thirst drain +50%; stamina efficiency halved.,Take +50% damage; hunger/thirst drain +50%; stamina efficiency halved.,Tilted by a nasty spin.
-casinoSlotMachine,Casino Slot Machine,Casino Slot Machine,Place to try your luck.
+Key,File,Type,UsedInMainMenu,NoTranslate,english,Context
+casinoTilted_name,buffs,Buff,,,Tilted,
+casinoTilted_desc,buffs,Buff,,,"Take +50% damage; hunger/thirst drain +50%; stamina efficiency halved.",
+cntCasinoSlot,blocks,Workstation,,,Casino Slot Machine,
+cntCasinoSlotDesc,blocks,Workstation,,,"Place to try your luck.",
+casino_msg_jackpot,ui,Message,,,"{0} hit the JACKPOT!",
+casino_msg_denied,ui,Message,,,Not enough dukes.,
+casino_msg_spin_cost,ui,Message,,,"Spin costs {0} dukes.",
+casino_msg_double_win,ui,Message,,,Double or Nothing: doubled your winnings!,
+casino_msg_double_lose,ui,Message,,,Double or Nothing: you lost everything.,
+casino_msg_reallybad,ui,Message,,,The machine backfires!,
+
+workstation_casino_slot,xui,Window,,,Casino Slot Machine,
+uiCasinoSpin,xui,UI,,,Spin,
+uiCasinoDouble,xui,UI,,,Double or Nothing,

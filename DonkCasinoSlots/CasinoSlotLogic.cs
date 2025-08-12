@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
 namespace DonkCasinoSlots
 {
@@ -8,27 +9,37 @@ namespace DonkCasinoSlots
     {
         public static void EnsureOutputSize(TileEntityWorkstation te, int desired)
         {
+            if (desired < 1) desired = 1;
             try
             {
-                if (te.output != null && te.output.Length >= desired) return;
+                var arr = te.output;
+                if (arr == null || arr.Length < desired)
+                {
+                    var newArr = ItemStack.CreateArray(desired);
+                    if (arr != null)
+                    {
+                        int copy = System.Math.Min(arr.Length, newArr.Length);
+                        for (int i = 0; i < copy; i++) newArr[i] = arr[i];
+                    }
 
-                var old = te.output ?? Array.Empty<ItemStack>();
-                var newer = new ItemStack[desired];
-                var n = Math.Min(old.Length, newer.Length);
-                for (int i = 0; i < n; i++) newer[i] = old[i];
+                    te.output = newArr;
+                    var old = te.output ?? Array.Empty<ItemStack>();
+                    var newer = new ItemStack[desired];
+                    var n = Math.Min(old.Length, newer.Length);
+                    for (int i = 0; i < n; i++) newer[i] = old[i];
+                    
+                    try {
+                        te.output = newer;
+                    } catch {
+                        var f = typeof(TileEntityWorkstation).GetField("output",
+                            BindingFlags.Instance |
+                            BindingFlags.Public |
+                            BindingFlags.NonPublic);
+                        f?.SetValue(te, newer);
+                    }
 
-                // assign (direct or via reflection fallback)
-                try {
-                    te.output = newer;
-                } catch {
-                    var f = typeof(TileEntityWorkstation).GetField("output",
-                        System.Reflection.BindingFlags.Instance |
-                        System.Reflection.BindingFlags.Public |
-                        System.Reflection.BindingFlags.NonPublic);
-                    f?.SetValue(te, newer);
+                    te.SetModified();
                 }
-
-                te.SetModified();
             }
             catch { /* best-effort; don’t crash the server */ }
         }
@@ -350,34 +361,37 @@ namespace DonkCasinoSlots
             }
         }
 
-        static bool TryMergeInto(ItemStack[] grid, ItemStack add)
+        static bool TryMergeInto(ItemStack[] output, ItemStack add)
         {
-            // merge with same item
-            for (int i = 0; i < grid.Length && add.count > 0; i++)
+            if (output == null || add.IsEmpty()) return true;
+
+            // Stack onto same items
+            for (int i = 0; i < output.Length && add.count > 0; i++)
             {
-                var s = grid[i];
+                var s = output[i];
                 if (s.IsEmpty()) continue;
-                if (!s.itemValue.Equals(add.itemValue)) continue;
+                if (s.itemValue.type != add.itemValue.type) continue;
+
                 int max = s.itemValue.ItemClass.Stacknumber.Value;
                 int space = max - s.count;
                 if (space <= 0) continue;
-                int move = Math.Min(space, add.count);
+
+                int move = Mathf.Min(space, add.count);
                 s.count += move;
-                grid[i] = s;
                 add.count -= move;
+                output[i] = s;
             }
 
-            // fill empties
-            for (int i = 0; i < grid.Length && add.count > 0; i++)
+            // Fill empties
+            for (int i = 0; i < output.Length && add.count > 0; i++)
             {
-                if (!grid[i].IsEmpty()) continue;
-                int max = add.itemValue.ItemClass.Stacknumber.Value;
-                int move = Math.Min(max, add.count);
-                grid[i] = new ItemStack(add.itemValue, move);
-                add.count -= move;
+                if (!output[i].IsEmpty()) continue;
+                output[i] = new ItemStack(add.itemValue.Clone(), add.count);
+                add.count = 0;
+                return true;
             }
 
-            return add.count <= 0;
+            return add.count == 0;
         }
 
         // === Really Bad effects ===

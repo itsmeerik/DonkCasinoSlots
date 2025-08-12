@@ -12,7 +12,7 @@ namespace DonkCasinoSlots
         {
             Harmony = new Harmony("com.donk.casino.v21");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            var t = typeof(NetPackageCasinoAction);
+            var t = typeof(NetPackageCasinoSlotAction);
             if (!NetPackageManager.knownPackageTypes.ContainsKey(t.Name))
                 NetPackageManager.knownPackageTypes[t.Name] = t;
             CasinoConfig.Load(); // read Config/casino_loot.xml

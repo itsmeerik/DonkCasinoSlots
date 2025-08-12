@@ -2,19 +2,38 @@ using System;
 
 namespace DonkCasinoSlots
 {
-    public enum CasinoActionType { Spin, DoubleOrNothing }
 
-    public class NetPackageCasinoAction : NetPackage
+    
+    public enum CasinoActionType : byte
+    {
+        Spin = 0,
+        DoubleOrNothing = 1
+    }
+
+    public class NetPackageCasinoSlotAction : NetPackage
     {
         private CasinoActionType action;
-        public NetPackageCasinoAction Setup(CasinoActionType a) { action = a; return this; }
 
-        public override void read(PooledBinaryReader br)  { action = (CasinoActionType)br.ReadByte(); }
-        public override void write(PooledBinaryWriter bw) { bw.Write((byte)action); }
+        public NetPackageCasinoSlotAction Setup(CasinoActionType a)
+        {
+            action = a;
+            return this;
+        }
+
+        public override void write(PooledBinaryWriter bw)
+        {
+            ((System.IO.BinaryWriter)bw).Write((byte)action); // force base-class overload
+        }
+
+        public override void read(PooledBinaryReader br)
+        {
+            action = (CasinoActionType)br.ReadByte(); // deserialize to enum
+        }
 
         public override void ProcessPackage(World world, GameManager gm)
         {
             if (!ConnectionManager.Instance.IsServer) return;
+
             var eid = this.Sender?.entityId ?? -1;
             var player = eid != -1 ? world.GetEntity(eid) as EntityPlayer : world.GetPrimaryPlayer();
             if (player == null) return;
@@ -23,7 +42,7 @@ namespace DonkCasinoSlots
             if (te == null) return;
 
             CasinoSlotLogic.EnsureOutputSize(te, CasinoConfig.OutputSlots);
-            CasinoSlotLogic.HandleAction(world, player, te.ToWorldPos(), action);
+            CasinoSlotLogic.HandleAction(world, player, te.ToWorldPos(), action); // <— enum
         }
 
         public override int GetLength() => 1;
@@ -43,16 +62,17 @@ namespace DonkCasinoSlots
                 var te = world.GetTileEntity(pos) as TileEntityWorkstation;
                 if (te == null) continue;
 
-                // Look at the block at this TE's position
                 var bv = world.GetBlock(pos);
-                var block = Block.list[(int)bv.type];
+                int idx = (int)bv.type;
+                if (idx < 0 || idx >= Block.list.Length) continue;
+                var block = Block.list[idx];
                 if (block == null) continue;
 
                 // Option A: match by your block's name from blocks.xml
                 // (e.g., <block name="cntCasinoSlot" .../>)
                 var blockName = block.GetBlockName(); // v2.1 method name
                 if (!string.IsNullOrEmpty(blockName) &&
-                    blockName.Equals("cntCasinoSlot", StringComparison.OrdinalIgnoreCase))
+                    blockName.Equals("Casino Slot Machine", StringComparison.OrdinalIgnoreCase))
                     return te;
 
                 // Option B: match by the Workstation property defined in your blocks.xml

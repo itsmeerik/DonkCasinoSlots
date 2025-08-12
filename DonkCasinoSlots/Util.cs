@@ -38,7 +38,7 @@ namespace DonkCasinoSlots
 
         public static void SendCasinoAction(CasinoActionType type)
         {
-            var pkg = NetPackageManager.GetPackage<NetPackageCasinoAction>().Setup(type);
+            var pkg = NetPackageManager.GetPackage<NetPackageCasinoSlotAction>().Setup(type);
             ConnectionManager.Instance.SendToServer(pkg);
         }
 

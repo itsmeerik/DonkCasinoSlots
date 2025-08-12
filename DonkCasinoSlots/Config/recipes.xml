@@ -2,13 +2,12 @@
 <config>
     <append xpath="/recipes">
         <!-- Craftable only at a Workbench -->
-        <recipe name="casinoSlotMachine" count="1" craft_time="30">
+        <recipe name="cntCasinoSlot" count="1" craft_time="30" tags="packMuleCrafting">
             <ingredient name="resourceForgedSteel"     count="40"/>
             <ingredient name="resourceMechanicalParts" count="30"/>
-            <ingredient name="resourceElectricalParts" count="25"/>
+            <ingredient name="resourceElectricParts" count="25"/>
             <ingredient name="resourceDuctTape"        count="10"/>
             <ingredient name="resourceAcid"            count="1"/>
-            <craft_area name="workbench"/>
         </recipe>
     </append>
 </config>
