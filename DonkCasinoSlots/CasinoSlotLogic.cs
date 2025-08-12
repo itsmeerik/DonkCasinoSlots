@@ -102,6 +102,7 @@ namespace DonkCasinoSlots
 
                 case "jackpot":
                     addedAny = RollGroupIntoOutput(world, te, output, CasinoConfig.Jackpot, CasinoConfig.JackpotRolls, player.entityId);
+                    RollLootXmlGroupIntoOutput(world, player, te, output, "selectRelic", rolls: 2, uniquePerRoll: true);
                     if (addedAny)
                         GameManager.Instance.ChatMessageServer(
                             null, EChatType.Global, -1,
@@ -109,6 +110,76 @@ namespace DonkCasinoSlots
                             null, EMessageSender.Server);       
                     break;
             }
+        }
+        
+        // Roll a loot.xml lootgroup by name and merge results into the machine's output
+        static bool RollLootXmlGroupIntoOutput(
+            World world,
+            EntityPlayer player,
+            TileEntityWorkstation te,
+            ItemStack[] output,
+            string lootGroupName,
+            int rolls = 1,                 // how many times to roll the group
+            bool uniquePerRoll = true,     // pass-through to loot system
+            bool ignoreLootProb = false,   // pass-through to loot system
+            float rareLootChance = 0f,     // usually 0 unless you want bonus chance
+            float gameStageOverride = -1f) // if <0, we’ll compute below
+        {
+            // Make sure loot groups are loaded and the group exists
+            if (!LootContainer.IsLoaded()) return false;
+            if (!LootContainer.lootGroups.TryGetValue(lootGroupName, out var group) || group == null)
+                return false;
+
+            // RNG used by the built-in loot system
+            var rand = GameManager.Instance.lootManager.Random;
+
+            // Loot stage (controls quality templates). Use your own calc if you prefer.
+            float gameStage = gameStageOverride >= 0
+                ? gameStageOverride
+                : Mathf.Max(1f, player?.Progression?.Level ?? 1); // simple default; replace with your GS formula if you have one
+
+            // The group may have its own quality template; the API wants the template name.
+            string lqt = group.lootQualityTemplate;
+
+            // We’ll let the system spawn into a temporary list, then pour into the winnings grid
+            var spawned = new List<ItemStack>();
+            int slotsLeft = 999; // we handle merging/spilling ourselves
+
+            bool any = LootContainer.SpawnItemsFromGroup(
+                rand,
+                group,
+                rolls,                  // number of picks from this lootgroup
+                1f,                     // abundance (we keep it at 1 for casino)
+                spawned,
+                ref slotsLeft,
+                gameStage,              // quality/gamestage input
+                rareLootChance,
+                lqt,
+                player,                 // pass player for buffs/effects
+                FastTags<TagGroup.Global>.none,
+                uniquePerRoll,
+                ignoreLootProb,
+                /*_forceStacking*/ false,
+                /*_buffsToAdd*/ null);
+
+            if (!any || spawned.Count == 0) return false;
+
+            // Merge into your winnings inventory (preserves quality & mods)
+            foreach (var st in spawned)
+            {
+                if (st.IsEmpty()) continue;
+
+                // Try to merge whole stack into output, otherwise drop near the machine
+                if (!TryMergeInto(output, st))
+                {
+                    var dropPos = te.ToWorldPos().ToVector3() + Vector3.up * 1.2f;
+                    // Use your existing helper that wraps ItemDropServer/EntityItem:
+                    GameManager.Instance.ItemDropServer(st, dropPos, Vector3.zero, -1, 60f, false);
+                }
+            }
+
+            te.SetModified();
+            return true;
         }
 
         static void DoDoubleOrNothing(World world, EntityPlayer player, TileEntityWorkstation te, ItemStack[] output)

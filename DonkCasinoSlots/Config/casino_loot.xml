@@ -2,7 +2,7 @@
 <casino>
     <economy spin_cost_dukes="500"/>
     <odds reallyBad="0.02" bad="0.68" good="0.28" jackpot="0.02"/>
-    <badEffects tilted="0.35" explode="0.15" spawn="0.50"/> <!-- used only when 'bad' hits -->
+    <badEffects tilted="0.35" explode="0.15" spawn="0.50"/> <!-- used only when 'really bad' hits -->
     <ragdoll radius="10" base_force="1.3" upward_bias="0.25" duration="2.5" falloff="linear"/>
 
     <buckets>
@@ -23,18 +23,118 @@
     </group>
 
     <group name="good">
-        <item name="casinoCoin" min="300" max="900" weight="35"/>
+        <item name="casinoCoin" min="500" max="1000" weight="35"/>
+        <item name="oldCash" min="200" max="500" weight="35"/>
         <item name="ammo9mmBulletBall" min="100" max="1000" weight="25"/>
         <item name="firstAidBandage" min="2" max="5" weight="20"/>
-        <item name="gunPartMachinePistol" min="1" max="1" weight="10"/>
         <item name="modMeleeStructuralBrace" min="1" max="1" weight="10"/>
+        <item name="questRewardT2HandgunBundle" min="1" max="1" weight="5"/>
+        <item name="questRewardT2ShotgunBundle" min="1" max="1" weight="5"/>
+        <item name="questRewardT2RifleBundle" min="1" max="1" weight="5"/>
+        <item name="questRewardT2MachineGunBundle" min="1" max="1" weight="5"/>
+        <item name="bookLuckyLooterDukes" min="1" max="1" weight="15" />
+        <item name="bookLuckyLooterAmmunition" min="1" max="1" weight="15" />
+        <item name="bookLuckyLooterBrass" min="1" max="1" weight="15" />
+        <item name="bookLuckyLooterLead" min="1" max="1" weight="15" />
+        <item name="bookLuckyLooterBooks" min="1" max="1" weight="15" />
+        <item name="bookLuckyLooterFood" min="1" max="1" weight="15" />
+        <item name="bookLuckyLooterMedical" min="1" max="1" weight="15" />
+        <item name="resourceLockPickBundle" min="1"max="1" weight="5" />
+        <item name="resourceLockPick" min="5" max="10" weight="20" />
     </group>
 
     <group name="jackpot">
         <item name="casinoCoin" min="5000" max="15000" weight="55"/>
-        <item name="modWeaponSilencer" min="1" max="1" weight="15"/>
-        <item name="vehicleAccessories4x4Truck" min="1" max="1" weight="10"/>
-        <item name="bookUrbanCombatV7" min="1" max="1" weight="10"/>
-        <item name="diamond" min="1" max="2" weight="10"/>
+        <item name="oldCash" min="1000" max="5000" weight="35"/>
+        <item name="resourceLegendaryParts" min="1" max="10" weight="15" />
+        <item name="resourceRawDiamond" min="50" max="75" weight="10"/>
+        <item name="resourceGoldNugget" min="100" max="150" weight="10"/>
+        <item name="resourceSilverNugget" min="200" max="300" weight="10"/>
+        <item name="toolDewFilter" min="1" max="1" weight="15" />
+        <item name="toolForgeCrucible" min="1" max="1" weight="15" />
+        <item name="toolBeaker" min="1" max="1" weight="15" />
+        <item name="tier06Miner01" min="1" max="1" weight="1" />
+        <item name="tier06Nomad01" min="1" max="1" weight="1" />
+        <item name="tier06Assassin01" min="1" max="1" weight="1" />
+        <item name="tier06Commando01" min="1" max="1" weight="1" />
+        <item name="tier06Lumberjack01" min="1" max="1" weight="1" />
+        <item name="tier06Preacher01" min="1" max="1" weight="1" />
+        <item name="tier06Rogue01" min="1" max="1" weight="1" />
+        <item name="tier06Athletic01" min="1" max="1" weight="1" />
+        <item name="tier06Enforcer01" min="1" max="1" weight="1" />
+        <item name="tier06Farmer01" min="1" max="1" weight="1" />
+        <item name="tier06Biker01" min="1" max="1" weight="1" />
+        <item name="tier06Scavenger01" min="1" max="1" weight="1" />
+        <item name="tier06Ranger01" min="1" max="1" weight="1" />
+        <item name="tier06Nerd01" min="1" max="1" weight="1" />
+        <item name="tier06Raider01" min="1" max="1" weight="1" />
+        <item name="tier06PerceptionMelee" min="1" max="1" weight="5" />
+        <item name="tier06PerceptionRanged" min="1" max="1" weight="5" />
+        <item name="tier06PerceptionWeapons" min="1" max="1" weight="5" />
+        <item name="tier06StrengthMelee01" min="1" max="1" weight="5" />
+        <item name="tier06StrengthMelee02" min="1" max="1" weight="5" />
+        <item name="tier06StrengthRanged" min="1" max="1" weight="5" />
+        <item name="tier06StrengthWeapons" min="1" max="1" weight="5" />
+        <item name="tier06FortitudeMelee" min="1" max="1" weight="5" />
+        <item name="tier06FortitudeRanged" min="1" max="1" weight="5" />
+        <item name="tier06FortitudeWeapons" min="1" max="1" weight="5" />
+        <item name="tier06AgilityMelee" min="1" max="1" weight="5" />
+        <item name="tier06AgilityRanged01" min="1" max="1" weight="5" />
+        <item name="tier06AgilityRanged02" min="1" max="1" weight="5" />
+        <item name="tier06AgilityRanged03" min="1" max="1" weight="5" />
+        <item name="tier06AgilityRanged04" min="1" max="1" weight="5" />
+        <item name="tier06IntellectMelee" min="1" max="1" weight="5" />
+        <item name="tier06IntellectRanged" min="1" max="1" weight="5" />
+        <item name="questRewardT3HandgunLegendaryBundle" min="1" max="1" weight="5" />
+        <item name="questRewardT3ShotgunLegendaryBundle" min="1" max="1" weight="5" />
+        <item name="questRewardT3RifleLegendaryBundle" min="1" max="1" weight="5" />
+        <item name="questRewardT3MachineGunLegendaryBundle" min="1" max="1" weight="5" />
+        <item name="questRewardT3SMGBundle" min="1" max="1" weight="5" />
+        <item name="SMAAutumnsCall" min="1" max="1" weight="5" />
+        <item name="SMABrasswindBlade" min="1" max="1" weight="5" />
+        <item name="SMASerpentsEdge" min="1" max="1" weight="5"/>
+        <item name="SMAMjölnirsEcho" min="1" max="1" weight="5"/>
+        <item name="SMAAbyssalReach" min="1" max="1" weight="5"/>
+        <item name="SMAWhisperingDeath" min="1" max="1" weight="5"/>
+        <item name="SMARadiance" min="1" max="1" weight="5"/>
+        <item name="SMAGrimVortex" min="1" max="1" weight="5"/>
+        <item name="SMACrimsonWrath" min="1" max="1" weight="5"/>
+        <item name="SMAStoneboundHammer" min="1" max="1" weight="5"/>
+        <item name="SMAClockworkReaver" min="1" max="1" weight="5"/>
+        <item name="SMAReapersMaul" min="1" max="1" weight="5"/>
+        <item name="SMADrakesFang" min="1" max="1" weight="5"/>
+        <item name="SMAIronwyrm" min="1" max="1" weight="5"/>
+        <item name="SMALWDragonFist" min="1" max="1" weight="5"/>
+        <item name="SMACarapaceClub" min="1" max="1" weight="5"/>
+        <item name="SMABeonKnife" min="1" max="1" weight="5"/>
+        <item name="SMASpearNew" min="1" max="1" weight="5"/>
+        <item name="SMAThunderBreaker" min="1" max="1" weight="5"/>
+        <item name="SMATwoHandedKatana" min="1" max="1" weight="5"/>
+        <item name="SMASpineEdge" min="1" max="1" weight="5"/>
+        <item name="SMAMace" min="1" max="1" weight="5"/>
+        <item name="SMAKopesh" min="1" max="1" weight="5"/>
+        <item name="LWWakizashi" min="1" max="1" weight="5"/>
+        <item name="LWFantasySword2" min="1" max="1" weight="5"/>
+        <item name="LWOneHanded" min="1" max="1" weight="5"/>
+        <item name="LWIceSword" min="1" max="1" weight="5"/>
+        <item name="LWFantasySword" min="1" max="1" weight="5"/>
+        <item name="LWMoltenGreatSword" min="1" max="1" weight="5"/>
+        <item name="LWDragonKnife" min="1" max="1" weight="5"/>
+        <item name="LWNewScythe" min="1" max="1" weight="5"/>
+        <item name="HolyScythe" min="1" max="1" weight="5"/>
+        <item name="LWFangtian" min="1" max="1" weight="5"/>
+        <item name="LWShamanGlaive" min="1" max="1" weight="5"/>
+        <item name="LWNokia" min="1" max="1" weight="5"/>
+        <item name="LWShamanMace" min="1" max="1" weight="5"/>
+        <item name="LWVolendrung" min="1" max="1" weight="5"/>
+        <item name="LWHornyBat" min="1" max="1" weight="5"/>
+        <item name="LWDragonSkullAxe" min="1" max="1" weight="5"/>
+        <item name="LWFantasyAxe" min="1" max="1" weight="5"/>
+        <item name="LWFireAxe" min="1" max="1" weight="5"/>
+        <item name="LWMaelstromAxe" min="1" max="1" weight="5"/>
+        <item name="LWSylphAxe" min="1" max="1" weight="5"/>
+        <item name="LWDragonBow" min="1" max="1" weight="5"/>
+        <item name="LWEpicBow" min="1" max="1" weight="5"/>
+        <item name="LWRustBow" min="1" max="1" weight="5"/>
     </group>
 </casino>
